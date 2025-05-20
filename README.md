@@ -5,9 +5,9 @@ AppDbContext.cs — Contexte EF Core, définit les DbSet<> des entités
 AppDbContextFactory.cs — Factory utilisée pour la création design-time du contexte (migrations)
 
 Migrations/
-20250520095124_InitialCreate.cs — Migration initiale des tables de base
-20250520115918_SeedAdmin.cs — Migration qui ajoute un utilisateur admin par défaut
-AppDbContextModelSnapshot.cs — Snapshot EF généré automatiquement pour suivre l'état du modèle
+20250520095124_InitialCreate.cs — Migration initiale des tables de base 
+20250520115918_SeedAdmin.cs — Migration qui ajoute un utilisateur admin par défaut 
+AppDbContextModelSnapshot.cs — Snapshot EF généré automatiquement pour suivre l'état du modèle 
 
 Models/
 Examen.cs — Entité représentant une session d’examen avec score, date, etc.
