@@ -1,4 +1,8 @@
-﻿using System.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Rditil.Data;
+using Rditil.Models;
+using System.Configuration;
 using System.Data;
 using System.Windows;
 
@@ -9,6 +13,7 @@ namespace Rditil
     /// </summary>
     public partial class App : Application
     {
+        public static Utilisateur? CurrentUser { get; set; }
     }
 
 }
