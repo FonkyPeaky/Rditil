@@ -59,6 +59,10 @@ Views/
 LoginPage.xaml — Interface de connexion
 
 WelcomePage.xaml — Page d'accueil avec les consignes avant de commencer l'examen
+
 QuestionPage.xaml — Affichage d'une question avec 4 réponses et navigation
+
 AdminPanel.xaml — Interface admin CRUD des utilisateurs
+
 EndPage.xaml — (prévu pour afficher le score et message de fin)
+
