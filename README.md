@@ -1,7 +1,7 @@
 Liste des classes ajoutées :
 
 Data/
-AppDbContext.cs — Contexte EF Core, définit les DbSet<> des entités
+AppDbContext.cs — Contexte EF Core, définit les DbSet<> des entités 
 AppDbContextFactory.cs — Factory utilisée pour la création design-time du contexte (migrations)
 
 Migrations/
