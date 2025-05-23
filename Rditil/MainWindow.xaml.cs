@@ -26,7 +26,8 @@ namespace Rditil
 
             using var context = new AppDbContext(options); context.Database.Migrate(); // Applique les migrations (crée la BDD si elle n'existe pas)
 
-            MainFrame.Navigate(new AdminPanel());
+            var window = new AdminPanel();
+            window.Show();
         }
     }
 }
