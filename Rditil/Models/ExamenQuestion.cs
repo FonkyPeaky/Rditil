@@ -17,3 +17,4 @@ namespace Rditil.Models
         public Reponse ReponseChoisie { get; set; }
     }
 }
+

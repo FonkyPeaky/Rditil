@@ -21,6 +21,7 @@ namespace Rditil.Data
         {
         }
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configuration de la clé composite si nécessaire

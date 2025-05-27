@@ -24,6 +24,8 @@ namespace Rditil.Migrations
                     table.PrimaryKey("PK_Questions", x => x.Id);
                 });
 
+
+
             migrationBuilder.CreateTable(
                 name: "Utilisateurs",
                 columns: table => new

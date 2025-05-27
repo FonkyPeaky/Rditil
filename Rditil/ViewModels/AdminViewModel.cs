@@ -20,7 +20,6 @@ namespace Rditil.ViewModels
         [ObservableProperty]
         private Utilisateur nouvelUtilisateur = new();
 
-
         public IRelayCommand AjouterCommand { get; }
         public IRelayCommand ModifierCommand { get; }
         public IRelayCommand SupprimerCommand { get; }
@@ -35,12 +34,10 @@ namespace Rditil.ViewModels
 
             ChargerUtilisateurs();
         }
-
         private void ChargerUtilisateurs()
         {
             Utilisateurs = new ObservableCollection<Utilisateur>(_context.Utilisateurs.ToList());
         }
-
         private void AjouterUtilisateur()
         {
             if (!string.IsNullOrWhiteSpace(NouvelUtilisateur.Email) &&
@@ -54,9 +51,6 @@ namespace Rditil.ViewModels
                 NouvelUtilisateur = new Utilisateur();
             }
         }
-
-
-
         private void ModifierUtilisateur()
         {
             if (UtilisateurSelectionne != null)
@@ -66,7 +60,6 @@ namespace Rditil.ViewModels
                 ChargerUtilisateurs();
             }
         }
-
         private void SupprimerUtilisateur()
         {
             if (UtilisateurSelectionne != null)
