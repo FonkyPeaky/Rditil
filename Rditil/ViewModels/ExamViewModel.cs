@@ -33,6 +33,10 @@ namespace Rditil.ViewModels
         {
             _context = context;
 
+
+
+
+
             // Initialize non-nullable fields
             _timer = new Timer(1000);
             questionEnCours = new Question();
@@ -100,5 +104,6 @@ namespace Rditil.ViewModels
                 // TODO: Calcul du score, redirection, sauvegarde
             });
         }
+                      
     }
 }
