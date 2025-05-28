@@ -45,7 +45,7 @@ namespace Rditil.ViewModels
             ReponsesEnCours.Clear();
             foreach (var reponse in QuestionEnCours.Reponses)
             {
-                ReponsesEnCours.Add(new ReponseChoix { Id = reponse.Id, Texte = reponse.Texte });
+                ReponsesEnCours.Add(new ReponseChoix { Id = reponse.Id, TextReponse = reponse.TextReponse });
             }
         }
 

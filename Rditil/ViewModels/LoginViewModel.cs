@@ -29,7 +29,7 @@ namespace Rditil.ViewModels
         public LoginViewModel(AuthService authService)
         {
             _authService = authService;
-            LoginCommand = new RelayCommand(async () => await LoginAsync());
+            LoginCommand = new RelayCommand<object>(async _ => await LoginAsync());
         }
 
         private async Task LoginAsync()

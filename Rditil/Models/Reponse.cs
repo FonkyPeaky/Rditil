@@ -9,9 +9,10 @@ namespace Rditil.Models
     public class Reponse
     {
         public int Id { get; set; }
-        public string TextReponse { get; set; }
+        public string? TextReponse { get; set; }
         public bool EstCorrect { get; set; }
         public int QuestionId { get; set; }
-        public Question Question { get; set; }
+        public Question? Question { get; set; }
+        public bool IsSelected { get; set; }
     }
 }

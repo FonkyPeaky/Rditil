@@ -20,17 +20,17 @@ namespace Rditil.ViewModels
         [ObservableProperty]
         private Utilisateur nouvelUtilisateur = new();
 
-        public IRelayCommand AjouterCommand { get; }
-        public IRelayCommand ModifierCommand { get; }
-        public IRelayCommand SupprimerCommand { get; }
+        public IRelayCommand<object?> AjouterCommand { get; }
+        public IRelayCommand<object?> ModifierCommand { get; }
+        public IRelayCommand<object?> SupprimerCommand { get; }
 
         public AdminViewModel(AppDbContext context)
         {
             _context = context;
 
-            AjouterCommand = new RelayCommand(AjouterUtilisateur);
-            ModifierCommand = new RelayCommand(ModifierUtilisateur);
-            SupprimerCommand = new RelayCommand(SupprimerUtilisateur);
+            AjouterCommand = new RelayCommand<object?>(AjouterUtilisateur);
+            ModifierCommand = new RelayCommand<object?>(ModifierUtilisateur);
+            SupprimerCommand = new RelayCommand<object?>(SupprimerUtilisateur);
 
             ChargerUtilisateurs();
         }
@@ -38,7 +38,7 @@ namespace Rditil.ViewModels
         {
             Utilisateurs = new ObservableCollection<Utilisateur>(_context.Utilisateurs.ToList());
         }
-        private void AjouterUtilisateur()
+        private void AjouterUtilisateur(object? obj)
         {
             if (!string.IsNullOrWhiteSpace(NouvelUtilisateur.Email) &&
                 !string.IsNullOrWhiteSpace(NouvelUtilisateur.Password))
@@ -46,12 +46,11 @@ namespace Rditil.ViewModels
                 _context.Utilisateurs.Add(NouvelUtilisateur);
                 _context.SaveChanges();
                 ChargerUtilisateurs();
-
                 // Réinitialise le formulaire
                 NouvelUtilisateur = new Utilisateur();
             }
         }
-        private void ModifierUtilisateur()
+        private void ModifierUtilisateur(object? obj)
         {
             if (UtilisateurSelectionne != null)
             {
@@ -60,7 +59,7 @@ namespace Rditil.ViewModels
                 ChargerUtilisateurs();
             }
         }
-        private void SupprimerUtilisateur()
+        private void SupprimerUtilisateur(object? obj)
         {
             if (UtilisateurSelectionne != null)
             {

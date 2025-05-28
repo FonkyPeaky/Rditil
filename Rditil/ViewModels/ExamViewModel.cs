@@ -28,7 +28,7 @@ namespace Rditil.ViewModels
         [ObservableProperty] private Question questionEnCours;
         [ObservableProperty] private ObservableCollection<ReponseChoix> reponsesEnCours;
         [ObservableProperty] private string tempsRestant;
-        public IRelayCommand SuivantCommand { get; }
+        public IRelayCommand<object?> SuivantCommand { get; }
         public ExamViewModel(AppDbContext context)
         {
             _context = context;
@@ -51,7 +51,7 @@ namespace Rditil.ViewModels
                         .Take(40)
                         .ToList());
 
-            SuivantCommand = new RelayCommand(PasserQuestionSuivante);
+            SuivantCommand = new RelayCommand<object?>(PasserQuestionSuivante);
 
             DémarrerChrono();
             ChargerQuestion(0);
@@ -83,7 +83,7 @@ namespace Rditil.ViewModels
                     IsChoisie = false
                 }));
         }
-        private void PasserQuestionSuivante()
+        private void PasserQuestionSuivante(object? obj)
         {
             // Enregistrer la réponse sélectionnée
             var reponseChoisie = ReponsesEnCours.FirstOrDefault(r => r.IsChoisie);
