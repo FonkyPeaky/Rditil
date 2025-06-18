@@ -3,10 +3,34 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Rditil.Views"
         mc:Ignorable="d"
-        Title="WelcomePage" Height="450" Width="800">
-    <Grid>
-        
+        Title="Bienvenue" Height="400" Width="600" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <TextBlock Text="Bienvenue dans l'examen ITIL"
+                   FontSize="24" FontWeight="Bold" TextAlignment="Center"
+                   HorizontalAlignment="Center" Margin="0 10" />
+
+        <!-- BODY -->
+        <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Text="Nom: {Binding App.CurrentUser.Nom}" FontSize="16" Margin="0 5"/>
+            <TextBlock Text="Prénom: {Binding App.CurrentUser.Prenom}" FontSize="16" Margin="0 5"/>
+            <TextBlock Text="Email: {Binding App.CurrentUser.Email}" FontSize="16" Margin="0 5"/>
+
+            <TextBlock Text="Votre dernier score : {Binding App.CurrentUser.Score}" FontSize="16" Margin="0 20 0 5"/>
+
+            <Button Content="Commencer l'examen" Width="200" Height="40" FontSize="16"
+                    Click="StartExam_Click" />
+        </StackPanel>
+
+        <!-- FOOTER -->
+        <TextBlock Grid.Row="2" Text="Bonne chance !" FontStyle="Italic" FontSize="14"
+                   HorizontalAlignment="Center" Margin="0 20 0 0"/>
     </Grid>
 </Window>

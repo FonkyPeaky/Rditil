@@ -19,9 +19,20 @@ namespace Rditil.Views
     /// </summary>
     public partial class EndPage : Window
     {
-        public EndPage()
+        public EndPage(int score)
         {
             InitializeComponent();
+            DataContext = new
+            {
+                Score = score,
+                Pourcentage = (int)((score / 40.0) * 100)
+            };
+        }
+
+        private void Quitter_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
         }
     }
+
 }

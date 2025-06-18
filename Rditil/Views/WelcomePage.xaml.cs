@@ -23,5 +23,13 @@ namespace Rditil.Views
         {
             InitializeComponent();
         }
+
+        public void StartExam_Click(object sender, RoutedEventArgs e)
+        {
+            var examWindow = new ExamenView(App.CurrentUser.Email);
+            examWindow.Show();
+            this.Close();
+        }
+
     }
 }
