@@ -1,61 +1,60 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Rditil.Data;
 using Rditil.Models;
+using Rditil.Services;
+using Rditil.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Threading;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Timer = System.Timers.Timer;
 using System.Timers;
-using Microsoft.EntityFrameworkCore;
 using System.Windows;
+using Timer = System.Timers.Timer;
 
 namespace Rditil.ViewModels
 {
     public partial class ExamViewModel : ObservableObject
     {
-        private readonly AppDbContext _context;
+        private readonly IExcelService _excelService;
+        private readonly EmailService _emailService;
+        private readonly string _userEmail;
+
         private int _index = 0;
+        private int _score = 0;
         private readonly Timer _timer;
         private TimeSpan _tempsRestant = TimeSpan.FromMinutes(60);
-        public Models.ReponseChoix rch = new();
 
         public ObservableCollection<Question> QuestionsTirees { get; set; }
+
         [ObservableProperty] private Question questionEnCours;
         [ObservableProperty] private ObservableCollection<ReponseChoix> reponsesEnCours;
         [ObservableProperty] private string tempsRestant;
+
         public IRelayCommand<object?> SuivantCommand { get; }
-        public ExamViewModel(AppDbContext context)
+
+        public ExamViewModel(IExcelService excelService, EmailService emailService, string userEmail)
         {
-            _context = context;
+            _excelService = excelService;
+            _emailService = emailService;
+            _userEmail = userEmail;
 
-
-
-
-
-            // Initialize non-nullable fields
             _timer = new Timer(1000);
             questionEnCours = new Question();
             reponsesEnCours = new ObservableCollection<ReponseChoix>();
             tempsRestant = string.Empty;
 
-            // Tirage aléatoire de 40 questions
+            // Charger 40 questions aléatoires depuis Excel
             QuestionsTirees = new ObservableCollection<Question>(
-                _context.Questions
-                        .Include(q => q.Reponses)
-                        .OrderBy(q => Guid.NewGuid())
-                        .Take(40)
-                        .ToList());
+                _excelService.GetRandomQuestions(40)
+            );
 
             SuivantCommand = new RelayCommand<object?>(PasserQuestionSuivante);
 
             DémarrerChrono();
             ChargerQuestion(0);
         }
+
         public void DémarrerChrono()
         {
             _timer.Elapsed += (s, e) =>
@@ -66,13 +65,16 @@ namespace Rditil.ViewModels
                 if (_tempsRestant.TotalSeconds <= 0)
                 {
                     _timer.Stop();
-                    FinirExamen();
+                    Application.Current.Dispatcher.Invoke(async () => await FinirExamenAsync());
                 }
             };
             _timer.Start();
         }
+
         public void ChargerQuestion(int index)
         {
+            if (index < 0 || index >= QuestionsTirees.Count) return;
+
             QuestionEnCours = QuestionsTirees[index];
             ReponsesEnCours = new ObservableCollection<ReponseChoix>(
                 QuestionEnCours.Reponses.Select(r => new ReponseChoix
@@ -83,27 +85,66 @@ namespace Rditil.ViewModels
                     IsChoisie = false
                 }));
         }
-        private void PasserQuestionSuivante(object? obj)
+
+        private async void PasserQuestionSuivante(object? obj)
         {
-            // Enregistrer la réponse sélectionnée
             var reponseChoisie = ReponsesEnCours.FirstOrDefault(r => r.IsChoisie);
-            // (optionnel : stocker la réponse dans un dictionnaire pour le score)
+            if (reponseChoisie != null && reponseChoisie.EstCorrect)
+            {
+                _score++;
+            }
 
             _index++;
             if (_index < QuestionsTirees.Count)
                 ChargerQuestion(_index);
             else
-                FinirExamen();
+                await FinirExamenAsync();
         }
-        private void FinirExamen()
+
+        private async Task FinirExamenAsync()
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            _timer.Stop();
+
+            // Sauvegarder le score dans Excel
+            _excelService.SaveUserResult(_userEmail, _score);
+
+            // Envoyer l'email avec le résultat
+            try
             {
-                _timer.Stop();
-                MessageBox.Show("Examen terminé !");
-                // TODO: Calcul du score, redirection, sauvegarde
-            });
+                await _emailService.SendExamResultAsync(
+                    _userEmail,
+                    _userEmail,
+                    _score,
+                    QuestionsTirees.Count
+                );
+            }
+            catch
+            {
+                MessageBox.Show(
+                    "Erreur lors de l'envoi de l'email.",
+                    "Erreur",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
+
+            // Naviguer vers EndPage
+            var mainWindow = Application.Current.Windows
+                .OfType<Window>()
+                .FirstOrDefault(w => w.Title == "MainWindow");
+
+            if (mainWindow != null)
+            {
+                var frame = (System.Windows.Controls.Frame)mainWindow.FindName("MainFrame");
+                frame?.Navigate(new EndPage(
+                    new ResultViewModel(
+                        _emailService,
+                        _userEmail,
+                        _score,
+                        QuestionsTirees.Count
+                    )
+                ));
+            }
         }
-                      
     }
 }

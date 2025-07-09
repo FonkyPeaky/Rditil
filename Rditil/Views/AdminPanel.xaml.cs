@@ -1,15 +1,10 @@
-﻿using Rditil.Data;
-using Rditil.ViewModels;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows;
 using System.Windows.Input;
 
 namespace Rditil.Views
 {
     public partial class AdminPanel : Window
     {
-        private readonly AdminViewModel _viewModel;
-
         public AdminPanel()
         {
             InitializeComponent();
@@ -28,9 +23,9 @@ namespace Rditil.Views
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
-            if (DataContext is AdminViewModel vm)
-                vm.NouvelUtilisateur.Password = PasswordBox.Password;
-
+            // Si plus tard tu recrées AdminViewModel, tu pourras réactiver ça
+            // if (DataContext is AdminViewModel vm)
+            //     vm.NouvelUtilisateur.Password = PasswordBox.Password;
         }
     }
 }

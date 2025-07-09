@@ -12,7 +12,7 @@ namespace Rditil.ViewModels
 {
     public partial class LoginViewModel : ObservableObject
     {
-        private readonly AuthService _authService;
+        private readonly IExcelService _excelService;
 
         [ObservableProperty]
         private string email;
@@ -23,21 +23,24 @@ namespace Rditil.ViewModels
         [ObservableProperty]
         private string errorMessage;
 
-
         public ICommand LoginCommand { get; }
 
-        public LoginViewModel(AuthService authService)
+        public LoginViewModel(IExcelService excelService)
         {
-            _authService = authService;
-            LoginCommand = new RelayCommand<object>(async _ => await LoginAsync());
+            _excelService = excelService;
+            LoginCommand = new AsyncRelayCommand(LoginAsync);
         }
 
         private async Task LoginAsync()
         {
-            var user = await _authService.LoginAsync(Email, Password);
+            // Simuler async même si Excel est sync
+            await Task.Delay(100);
+
+            var user = _excelService.GetUserByEmailAndPassword(Email, Password);
             if (user != null)
             {
                 App.CurrentUser = user;
+
                 var window = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
                 if (user.IsAdmin)
                     window.MainFrame.Navigate(new AdminPanel());

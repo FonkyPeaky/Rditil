@@ -1,8 +1,5 @@
-﻿using Rditil.Data;
-using Rditil.Services;
+﻿using Rditil.Services;
 using Rditil.ViewModels;
-using System;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -16,10 +13,9 @@ namespace Rditil.Views
         {
             InitializeComponent();
 
-            var context = new AppDbContextFactory().CreateDbContext(Array.Empty<string>());
-            var authService = new AuthService(context);
-             
-            _viewModel = new LoginViewModel(authService);
+            // Utiliser ExcelService direct
+            var excelService = new ExcelService();
+            _viewModel = new LoginViewModel(excelService);
             this.DataContext = _viewModel;
         }
 

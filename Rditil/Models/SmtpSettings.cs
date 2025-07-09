@@ -9,4 +9,4 @@ namespace Rditil.Models
         public string FromEmail { get; set; }
         public bool EnableSsl { get; set; }
     }
-} 
+}

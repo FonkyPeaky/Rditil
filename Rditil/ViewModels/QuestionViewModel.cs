@@ -16,23 +16,42 @@ namespace Rditil.ViewModels
         private Timer _timer;
         private TimeSpan _tempsRestant;
         private int _index;
+
         public ObservableCollection<Question> QuestionsTirees { get; set; }
         public Question QuestionEnCours { get; set; }
         public ObservableCollection<ReponseChoix> ReponsesEnCours { get; set; }
+
+        private string _tempsRestantAffiche;
+        public string TempsRestantAffiche
+        {
+            get => _tempsRestantAffiche;
+            set => SetProperty(ref _tempsRestantAffiche, value);
+        }
 
         public QuestionViewModel()
         {
             QuestionsTirees = new ObservableCollection<Question>();
             ReponsesEnCours = new ObservableCollection<ReponseChoix>();
+
+            _tempsRestant = TimeSpan.FromMinutes(60);
+            TempsRestantAffiche = _tempsRestant.ToString(@"mm\:ss");
+
             _timer = new Timer(1000);
             _timer.Elapsed += (sender, e) =>
             {
-                _tempsRestant -= TimeSpan.FromSeconds(1);
+                _tempsRestant = _tempsRestant.Subtract(TimeSpan.FromSeconds(1));
+
+                TempsRestantAffiche = _tempsRestant.ToString(@"mm\:ss");
+                OnPropertyChanged(nameof(TempsRestantAffiche));
+
                 if (_tempsRestant <= TimeSpan.Zero)
                 {
                     _timer.Stop();
-                    MessageBox.Show("Temps écoulé !", "Fin de l'examen", MessageBoxButton.OK, MessageBoxImage.Information);
-                    // Logique pour terminer l'examen
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        MessageBox.Show("Temps écoulé !", "Fin de l'examen", MessageBoxButton.OK, MessageBoxImage.Information);
+                        // Logique pour terminer l'examen
+                    });
                 }
             };
             _timer.Start();
@@ -59,8 +78,11 @@ namespace Rditil.ViewModels
             else
             {
                 _timer.Stop();
-                MessageBox.Show("Examen terminé !", "Fin de l'examen", MessageBoxButton.OK, MessageBoxImage.Information);
-                // Logique pour terminer l'examen
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    MessageBox.Show("Examen terminé !", "Fin de l'examen", MessageBoxButton.OK, MessageBoxImage.Information);
+                    // Logique pour terminer l'examen
+                });
             }
         }
     }

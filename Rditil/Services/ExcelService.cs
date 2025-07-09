@@ -190,7 +190,16 @@ namespace Rditil.Services
                     }
                 }
                 package.Save();
+
+
             }
+
         }
+        public User GetUserByEmailAndPassword(string email, string password)
+        {
+            var users = GetAllUsers();
+            return users.FirstOrDefault(u => u.Email == email && u.MotDePasse == password);
+        }
+
     }
 } 

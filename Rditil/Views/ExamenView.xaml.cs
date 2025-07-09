@@ -12,13 +12,13 @@ namespace Rditil.Views
         {
             InitializeComponent();
 
-            var excelService = new ExcelService("chemin/vers/excel.xlsx"); // adapte le chemin
+            var excelService = new ExcelService("chemin/vers/excel.xlsx");
             var smtpSettings = new SmtpSettings
             {
                 Server = "smtp.office365.com",
                 Port = 587,
                 Username = "Rditil@outlook.com",
-                Password = "TON_MDP",
+                Password = "LE_MDP",
                 FromEmail = "Rditil@outlook.com",
                 EnableSsl = true
             };
@@ -34,17 +34,14 @@ namespace Rditil.Views
                     .OfType<ExamenView>()
                     .FirstOrDefault()?.Close();
             });
-
         }
-
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             DragMove();
         }
-
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
     }
-} 
+}

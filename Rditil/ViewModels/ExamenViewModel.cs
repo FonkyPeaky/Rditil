@@ -1,11 +1,13 @@
+using CommunityToolkit.Mvvm.Input;
+using Rditil.Models;
+using Rditil.Services;
+using Rditil.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using Rditil.Models;
-using Rditil.Services;
-using CommunityToolkit.Mvvm.Input;
 
 namespace Rditil.ViewModels
 {
@@ -42,7 +44,7 @@ namespace Rditil.ViewModels
             _currentQuestionIndex = 0;
             _score = 0;
 
-            QuestionSuivanteCommand = new RelayCommand<object?>(ExecuteQuestionSuivante, CanExecuteQuestionSuivante);
+            QuestionSuivanteCommand = new RelayCommand<object?>(async (param) => await ExecuteQuestionSuivante(param), CanExecuteQuestionSuivante);
 
             LoadCurrentQuestion();
         }
@@ -55,40 +57,82 @@ namespace Rditil.ViewModels
 
         private bool CanExecuteQuestionSuivante(object? parameter)
         {
-            return _currentQuestionIndex < _questions.Count - 1;
+            return _currentQuestionIndex < _questions.Count;
         }
 
-        private async void ExecuteQuestionSuivante(object? parameter)
+        private async Task ExecuteQuestionSuivante(object? parameter)
         {
-            // Vérifier la réponse
-            var reponseSelectionnee = QuestionActuelle.Reponses.FirstOrDefault(r => r.IsSelected);
-            if (reponseSelectionnee != null && reponseSelectionnee.EstCorrect)
+            try
             {
-                _score++;
-            }
+                // Vérifier la réponse
+                var reponseSelectionnee = QuestionActuelle.Reponses.FirstOrDefault(r => r.IsSelected);
+                if (reponseSelectionnee != null && reponseSelectionnee.EstCorrect)
+                {
+                    _score++;
+                }
 
-            if (_currentQuestionIndex < _questions.Count - 1)
-            {
                 _currentQuestionIndex++;
-                LoadCurrentQuestion();
+
+                if (_currentQuestionIndex < _questions.Count)
+                {
+                    LoadCurrentQuestion();
+                }
+                else
+                {
+                    await FinirExamenAsync();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                // Fin de l'examen
-                _excelService.SaveUserResult(_userEmail, _score);
-                
-                // Envoyer l'email avec les résultats
+                MessageBox.Show($"Erreur lors de la validation de la réponse : {ex.Message}");
+            }
+        }
+
+        private async Task FinirExamenAsync()
+        {
+            // Sauvegarder le score
+            _excelService.SaveUserResult(_userEmail, _score);
+
+            // Envoyer email résultat
+            try
+            {
                 await _emailService.SendExamResultAsync(
-                    "issam.elafi@randstaddigital.lu",
+                    _userEmail,
                     _userEmail,
                     _score,
                     _questions.Count
                 );
-
-                // Fermer la fenêtre
-                Application.Current.Windows.OfType<Window>()
-                    .FirstOrDefault(w => w.DataContext == this)?.Close();
             }
+            catch
+            {
+                MessageBox.Show(
+                    "Erreur lors de l'envoi de l'email.",
+                    "Erreur",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
+
+            // Naviguer vers EndPage
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                var mainWindow = Application.Current.Windows
+                    .OfType<Window>()
+                    .FirstOrDefault(w => w.Title == "MainWindow");
+
+                if (mainWindow != null)
+                {
+                    var frame = (System.Windows.Controls.Frame)mainWindow.FindName("MainFrame");
+                    frame?.Navigate(new EndPage(
+                        new ResultViewModel(
+                            _emailService,
+                            _userEmail,
+                            _score,
+                            _questions.Count
+                        )
+                    ));
+                }
+            });
         }
     }
-} 
+}
