@@ -16,8 +16,8 @@ namespace Rditil.ViewModels
 {
     public partial class ExamViewModel : ObservableObject
     {
-        private readonly IExcelService _excelService;
         private readonly EmailService _emailService;
+        private readonly DbQuestionService _questionService;
         private readonly string _userEmail;
 
         private int _index = 0;
@@ -33,26 +33,25 @@ namespace Rditil.ViewModels
 
         public IRelayCommand<object?> SuivantCommand { get; }
 
-        public ExamViewModel(IExcelService excelService, EmailService emailService, string userEmail)
+        public ExamViewModel(EmailService emailService, string userEmail)
         {
-            _excelService = excelService;
             _emailService = emailService;
             _userEmail = userEmail;
-
+            _questionService = new DbQuestionService(App.DbContext);
             _timer = new Timer(1000);
-            questionEnCours = new Question();
-            reponsesEnCours = new ObservableCollection<ReponseChoix>();
-            tempsRestant = string.Empty;
-
-            // Charger 40 questions aléatoires depuis Excel
-            QuestionsTirees = new ObservableCollection<Question>(
-                _excelService.GetRandomQuestions(40)
-            );
-
             SuivantCommand = new RelayCommand<object?>(PasserQuestionSuivante);
 
-            DémarrerChrono();
+            // Chargement des questions depuis PostgreSQL
+            var questions = _questionService.GetAllQuestions();
+
+            // Mélanger et prendre les 40 premières (si assez)
+            var questionsTirees = questions.OrderBy(q => Guid.NewGuid()).Take(40).ToList();
+            QuestionsTirees = new ObservableCollection<Question>(questionsTirees);
+
+            // Lancer l'examen
             ChargerQuestion(0);
+            TempsRestant = _tempsRestant.ToString(@"mm\:ss");
+            DémarrerChrono();
         }
 
         public void DémarrerChrono()
@@ -79,7 +78,6 @@ namespace Rditil.ViewModels
             ReponsesEnCours = new ObservableCollection<ReponseChoix>(
                 QuestionEnCours.Reponses.Select(r => new ReponseChoix
                 {
-                    Id = r.Id,
                     TextReponse = r.TextReponse,
                     EstCorrect = r.EstCorrect,
                     IsChoisie = false
@@ -105,10 +103,6 @@ namespace Rditil.ViewModels
         {
             _timer.Stop();
 
-            // Sauvegarder le score dans Excel
-            _excelService.SaveUserResult(_userEmail, _score);
-
-            // Envoyer l'email avec le résultat
             try
             {
                 await _emailService.SendExamResultAsync(
@@ -128,7 +122,6 @@ namespace Rditil.ViewModels
                 );
             }
 
-            // Naviguer vers EndPage
             var mainWindow = Application.Current.Windows
                 .OfType<Window>()
                 .FirstOrDefault(w => w.Title == "MainWindow");

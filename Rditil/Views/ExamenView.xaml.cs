@@ -12,33 +12,28 @@ namespace Rditil.Views
         {
             InitializeComponent();
 
-            var excelService = new ExcelService("chemin/vers/excel.xlsx");
-            var smtpSettings = new SmtpSettings
+            
+
+            var settings = new SmtpSettings
             {
-                Server = "smtp.office365.com",
+                Server = "smtp.example.com",
                 Port = 587,
-                Username = "Rditil@outlook.com",
-                Password = "LE_MDP",
-                FromEmail = "Rditil@outlook.com",
+                Username = "your_username",
+                Password = "your_password",
+                FromEmail = "noreply@example.com",
                 EnableSsl = true
             };
-            var emailService = new EmailService(smtpSettings);
 
-            DataContext = new ExamenViewModel(excelService, emailService, userEmail);
+            var emailService = new EmailService(settings);
 
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                var endPage = new EndPage(score);
-                endPage.Show();
-                Application.Current.Windows
-                    .OfType<ExamenView>()
-                    .FirstOrDefault()?.Close();
-            });
+            
         }
+
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             DragMove();
         }
+
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Close();

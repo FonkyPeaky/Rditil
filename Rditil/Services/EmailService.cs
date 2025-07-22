@@ -38,12 +38,12 @@ namespace Rditil.Services
                 {
                     Text = $@"Bonjour {userName},
 
-Voici le résultat de votre examen ITIL :
-Score : {score}/{totalQuestions}
-Pourcentage : {(score * 100.0 / totalQuestions):F2}%
+                            Voici le résultat de votre examen ITIL :
+                            Score : {score}/{totalQuestions}
+                            Pourcentage : {(score * 100.0 / totalQuestions):F2}%
 
-Cordialement,
-L'équipe ITIL"
+                            Cordialement,
+                            L'équipe RD"
                 };
 
                 using (var client = new SmtpClient())

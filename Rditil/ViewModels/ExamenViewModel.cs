@@ -13,7 +13,7 @@ namespace Rditil.ViewModels
 {
     public class ExamenViewModel : ViewModelBase
     {
-        private readonly IExcelService _excelService;
+        
         private readonly EmailService _emailService;
         private readonly string _userEmail;
         private readonly List<Question> _questions;
@@ -35,20 +35,6 @@ namespace Rditil.ViewModels
 
         public ICommand QuestionSuivanteCommand { get; }
 
-        public ExamenViewModel(IExcelService excelService, EmailService emailService, string userEmail)
-        {
-            _excelService = excelService;
-            _emailService = emailService;
-            _userEmail = userEmail;
-            _questions = _excelService.GetRandomQuestions(40);
-            _currentQuestionIndex = 0;
-            _score = 0;
-
-            QuestionSuivanteCommand = new RelayCommand<object?>(async (param) => await ExecuteQuestionSuivante(param), CanExecuteQuestionSuivante);
-
-            LoadCurrentQuestion();
-        }
-
         private void LoadCurrentQuestion()
         {
             QuestionActuelle = _questions[_currentQuestionIndex];
@@ -64,12 +50,6 @@ namespace Rditil.ViewModels
         {
             try
             {
-                // Vérifier la réponse
-                var reponseSelectionnee = QuestionActuelle.Reponses.FirstOrDefault(r => r.IsSelected);
-                if (reponseSelectionnee != null && reponseSelectionnee.EstCorrect)
-                {
-                    _score++;
-                }
 
                 _currentQuestionIndex++;
 
@@ -90,8 +70,10 @@ namespace Rditil.ViewModels
 
         private async Task FinirExamenAsync()
         {
-            // Sauvegarder le score
-            _excelService.SaveUserResult(_userEmail, _score);
+
+            var examResultService = new DbExamResultService(App.DbContext);
+            examResultService.EnregistrerExamen(App.CurrentUser, _score, QuestionsTirees.ToList());
+
 
             // Envoyer email résultat
             try

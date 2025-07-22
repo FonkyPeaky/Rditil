@@ -8,14 +8,16 @@ namespace Rditil.Models
 {
     public class Examen
     {
-        public int Id { get; set; }
+        public int Id_Examen { get; set; }
         public DateTime DateExamen { get; set; }
-        public int DureeExamen { get; set; } // en minutes
-        public int Score { get; set; }
+        public TimeSpan DureeExamen { get; set; }
+        public int SCORE { get; set; }
 
-        public int UtilisateurId { get; set; }
+        public int Id_Utilisateur { get; set; }
         public Utilisateur Utilisateur { get; set; }
-        public ICollection<ExamenQuestion> ExamenQuestions { get; set; }
+
+        public ICollection<Examen_Question> ExamenQuestions { get; set; }
     }
+
 
 }

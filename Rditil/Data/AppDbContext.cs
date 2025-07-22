@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO.Packaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,51 +10,26 @@ namespace Rditil.Data
 {
     public class AppDbContext : DbContext
     {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
         public DbSet<Utilisateur> Utilisateurs { get; set; }
-        public DbSet<Examen> Examens { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<Reponse> Reponses { get; set; }
-        public DbSet<ExamenQuestion> ExamenQuestions { get; set; }
-
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        {
-        }
-
+        public DbSet<Examen> Examens { get; set; }
+        public DbSet<Examen_Question> ExamenQuestions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configuration de la clé composite si nécessaire
-            modelBuilder.Entity<ExamenQuestion>()
+            modelBuilder.Entity<Examen_Question>()
                 .HasOne(eq => eq.Examen)
                 .WithMany(e => e.ExamenQuestions)
-                .HasForeignKey(eq => eq.ExamenId);
+                .HasForeignKey(eq => eq.Id_Examen);
 
-            modelBuilder.Entity<ExamenQuestion>()
+            modelBuilder.Entity<Examen_Question>()
                 .HasOne(eq => eq.Question)
                 .WithMany(q => q.ExamenQuestions)
-                .HasForeignKey(eq => eq.QuestionId);
-
-            modelBuilder.Entity<Reponse>()
-                .HasOne(r => r.Question)
-                .WithMany(q => q.Reponses)
-                .HasForeignKey(r => r.QuestionId);
-
-            modelBuilder.Entity<Utilisateur>().HasData(
-            new Utilisateur
-                {
-                    Id = 1,
-                    Nom = "Admin",
-                    Prenom = "Super",
-                    Email = "admin@examen.com",
-                    Password = "pipicaca", // À sécuriser plus tard !
-                    IsAdmin = true
-                }
-            );
-
+                .HasForeignKey(eq => eq.Id_Question);
         }
-
-
-
     }
-}
 
+}

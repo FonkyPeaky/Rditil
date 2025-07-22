@@ -8,10 +8,10 @@ namespace Rditil.ViewModels
 {
     public class AdminPanelViewModel : ViewModelBase
     {
-        private readonly IExcelService _excelService;
-        private User _nouvelUtilisateur;
+        
+        private Utilisateur _nouvelUtilisateur;
 
-        public User NouvelUtilisateur
+        public Utilisateur NouvelUtilisateur
         {
             get => _nouvelUtilisateur;
             set
@@ -23,41 +23,16 @@ namespace Rditil.ViewModels
 
         public ICommand AjouterCommand { get; }
 
-        public AdminPanelViewModel(IExcelService excelService)
+        /*public AdminPanelViewModel(IExcelService excelService)
         {
             _excelService = excelService;
-            NouvelUtilisateur = new User
+            NouvelUtilisateur = new Utilisateur
             {
                 DernierExamen = DateTime.MinValue,
                 Score = 0
             };
             AjouterCommand = new RelayCommand<object?>(ExecuteAjouter);
-        }
+        }*/
 
-        private void ExecuteAjouter(object? parameter)
-        {
-            if (string.IsNullOrWhiteSpace(NouvelUtilisateur.Email) ||
-                string.IsNullOrWhiteSpace(NouvelUtilisateur.Nom) ||
-                string.IsNullOrWhiteSpace(NouvelUtilisateur.MotDePasse))
-            {
-                // Afficher un message d'erreur
-                return;
-            }
-
-            try
-            {
-                _excelService.AddUser(NouvelUtilisateur);
-                // Réinitialiser le formulaire
-                NouvelUtilisateur = new User
-                {
-                    DernierExamen = DateTime.MinValue,
-                    Score = 0
-                };
-            }
-            catch (Exception ex)
-            {
-                // Gérer l'erreur
-            }
-        }
     }
 } 

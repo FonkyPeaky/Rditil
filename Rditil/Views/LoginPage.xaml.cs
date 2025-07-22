@@ -12,10 +12,6 @@ namespace Rditil.Views
         public LoginPage()
         {
             InitializeComponent();
-
-            // Utiliser ExcelService direct
-            var excelService = new ExcelService();
-            _viewModel = new LoginViewModel(excelService);
             this.DataContext = _viewModel;
         }
 

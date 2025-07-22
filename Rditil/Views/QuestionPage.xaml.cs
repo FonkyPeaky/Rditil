@@ -1,4 +1,5 @@
-﻿using Rditil.Data;
+﻿using Rditil.Models;
+using Rditil.Services;
 using Rditil.ViewModels;
 using System.Windows.Controls;
 
@@ -6,11 +7,25 @@ namespace Rditil.Views
 {
     public partial class QuestionPage : Page
     {
-        public QuestionPage()
+        public QuestionPage(string userEmail)
         {
             InitializeComponent();
-            var context = new AppDbContextFactory().CreateDbContext(Array.Empty<string>());
-            DataContext = new ExamViewModel(context);
+
+
+
+            var settings = new SmtpSettings
+            {
+                Server = "smtp.example.com",
+                Port = 587,
+                Username = "your_username",
+                Password = "your_password",
+                FromEmail = "noreply@example.com",
+                EnableSsl = true
+            };
+
+            var emailService = new EmailService(settings);
+
+           
         }
     }
 }

@@ -8,9 +8,11 @@ namespace Rditil.Models
 {
     public class Question
     {
-        public int Id { get; set; }
+        public int Id_Question { get; set; }
         public string Enonce { get; set; }
+
         public ICollection<Reponse> Reponses { get; set; }
-        public ICollection<ExamenQuestion> ExamenQuestions { get; set; }
+        public ICollection<Examen_Question> ExamenQuestions { get; set; }
     }
+
 }

@@ -6,14 +6,16 @@ using System.Threading.Tasks;
 
 namespace Rditil.Models
 {
-    public class Reponse
+    public class Examen_Question
     {
-        public int Id_Reponse { get; set; }
-        public string TextReponse { get; set; }
-        public bool EstCorrect { get; set; }
+        public int Id_Examen_Question { get; set; }
 
         public int Id_Question { get; set; }
         public Question Question { get; set; }
+
+        public int Id_Examen { get; set; }
+        public Examen Examen { get; set; }
     }
 
 }
+

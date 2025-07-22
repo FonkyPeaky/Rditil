@@ -62,10 +62,6 @@ namespace Rditil.ViewModels
             if (index < 0 || index >= QuestionsTirees.Count) return;
             QuestionEnCours = QuestionsTirees[index];
             ReponsesEnCours.Clear();
-            foreach (var reponse in QuestionEnCours.Reponses)
-            {
-                ReponsesEnCours.Add(new ReponseChoix { Id = reponse.Id, TextReponse = reponse.TextReponse });
-            }
         }
 
         private void PasserQuestionSuivante()

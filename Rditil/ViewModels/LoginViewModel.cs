@@ -1,56 +1,50 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using Rditil.Models;
 using Rditil.Services;
-using Rditil.Views;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Windows.Input;
 
 namespace Rditil.ViewModels
 {
-    public partial class LoginViewModel : ObservableObject
+    public class LoginViewModel : INotifyPropertyChanged
     {
-        private readonly IExcelService _excelService;
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string ErrorMessage { get; set; }
 
-        [ObservableProperty]
-        private string email;
+        public RelayCommand LoginCommand { get; set; }
 
-        [ObservableProperty]
-        private string password;
-
-        [ObservableProperty]
-        private string errorMessage;
-
-        public ICommand LoginCommand { get; }
-
-        public LoginViewModel(IExcelService excelService)
+        public LoginViewModel()
         {
-            _excelService = excelService;
-            LoginCommand = new AsyncRelayCommand(LoginAsync);
+            LoginCommand = new RelayCommand(Login);
         }
 
-        private async Task LoginAsync()
+        private void Login()
         {
-            // Simuler async même si Excel est sync
-            await Task.Delay(100);
+            var userService = new DbUserService(App.DbContext);
 
-            var user = _excelService.GetUserByEmailAndPassword(Email, Password);
+            var user = userService.GetUserByEmailAndPassword(Email, Password);
             if (user != null)
             {
                 App.CurrentUser = user;
 
-                var window = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
-                if (user.IsAdmin)
-                    window.MainFrame.Navigate(new AdminPanel());
-                else
-                    window.MainFrame.Navigate(new WelcomePage());
+                var examWindow = new Views.ExamPage();
+                examWindow.Show();
+
+                Application.Current.Windows[0]?.Close(); // Ferme la fenêtre Login
             }
             else
             {
-                ErrorMessage = "Identifiants invalides.";
+                ErrorMessage = "Email ou mot de passe incorrect.";
+                OnPropertyChanged(nameof(ErrorMessage));
             }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string prop = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
     }
 }

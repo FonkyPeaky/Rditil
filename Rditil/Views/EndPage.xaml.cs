@@ -13,5 +13,10 @@ namespace Rditil.Views
             InitializeComponent();
             DataContext = viewModel;
         }
+        private void Quitter_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
     }
 }
