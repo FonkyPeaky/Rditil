@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Rditil.Data;
 
 #nullable disable
@@ -11,186 +12,182 @@ using Rditil.Data;
 namespace Rditil.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250520115918_SeedAdmin")]
-    partial class SeedAdmin
+    [Migration("20250723143601_InitSchema")]
+    partial class InitSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.5");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "9.0.7")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Rditil.Models.Examen", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("Id_Examen")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id_Examen"));
 
                     b.Property<DateTime>("DateExamen")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("DureeExamen")
-                        .HasColumnType("INTEGER");
+                    b.Property<TimeSpan>("DureeExamen")
+                        .HasColumnType("interval");
 
-                    b.Property<int>("Score")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("Id_Utilisateur")
+                        .HasColumnType("integer");
 
-                    b.Property<int>("UtilisateurId")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("SCORE")
+                        .HasColumnType("integer");
 
-                    b.HasKey("Id");
+                    b.Property<int>("UtilisateurId_Utilisateur")
+                        .HasColumnType("integer");
 
-                    b.HasIndex("UtilisateurId");
+                    b.HasKey("Id_Examen");
+
+                    b.HasIndex("UtilisateurId_Utilisateur");
 
                     b.ToTable("Examens");
                 });
 
-            modelBuilder.Entity("Rditil.Models.ExamenQuestion", b =>
+            modelBuilder.Entity("Rditil.Models.Examen_Question", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("Id_Examen")
+                        .HasColumnType("integer");
 
-                    b.Property<int>("ExamenId")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("Id_Question")
+                        .HasColumnType("integer");
 
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("INTEGER");
+                    b.Property<int?>("ExamenId_Examen")
+                        .HasColumnType("integer");
 
-                    b.Property<int?>("ReponseChoisieId")
-                        .HasColumnType("INTEGER");
+                    b.HasKey("Id_Examen", "Id_Question");
 
-                    b.HasKey("Id");
+                    b.HasIndex("ExamenId_Examen");
 
-                    b.HasIndex("ExamenId");
-
-                    b.HasIndex("QuestionId");
-
-                    b.HasIndex("ReponseChoisieId");
+                    b.HasIndex("Id_Question");
 
                     b.ToTable("ExamenQuestions");
                 });
 
             modelBuilder.Entity("Rditil.Models.Question", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("Id_Question")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id_Question"));
 
                     b.Property<string>("Enonce")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id_Question");
 
                     b.ToTable("Questions");
                 });
 
             modelBuilder.Entity("Rditil.Models.Reponse", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("Id_Reponse")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id_Reponse"));
 
                     b.Property<bool>("EstCorrect")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("boolean");
 
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("Id_Question")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("QuestionId_Question")
+                        .HasColumnType("integer");
 
                     b.Property<string>("TextReponse")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id_Reponse");
 
-                    b.HasIndex("QuestionId");
+                    b.HasIndex("QuestionId_Question");
 
                     b.ToTable("Reponses");
                 });
 
             modelBuilder.Entity("Rditil.Models.Utilisateur", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("Id_Utilisateur")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id_Utilisateur"));
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("text");
 
                     b.Property<string>("Nom")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<string>("Prenom")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id_Utilisateur");
 
                     b.ToTable("Utilisateurs");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "admin@examen.com",
-                            IsAdmin = true,
-                            Nom = "Admin",
-                            Password = "pipicaca",
-                            Prenom = "Super"
-                        });
                 });
 
             modelBuilder.Entity("Rditil.Models.Examen", b =>
                 {
                     b.HasOne("Rditil.Models.Utilisateur", "Utilisateur")
                         .WithMany("Examens")
-                        .HasForeignKey("UtilisateurId")
+                        .HasForeignKey("UtilisateurId_Utilisateur")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Utilisateur");
                 });
 
-            modelBuilder.Entity("Rditil.Models.ExamenQuestion", b =>
+            modelBuilder.Entity("Rditil.Models.Examen_Question", b =>
                 {
+                    b.HasOne("Rditil.Models.Examen", null)
+                        .WithMany("Examen_Questions")
+                        .HasForeignKey("ExamenId_Examen");
+
                     b.HasOne("Rditil.Models.Examen", "Examen")
                         .WithMany("ExamenQuestions")
-                        .HasForeignKey("ExamenId")
+                        .HasForeignKey("Id_Examen")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Rditil.Models.Question", "Question")
                         .WithMany("ExamenQuestions")
-                        .HasForeignKey("QuestionId")
+                        .HasForeignKey("Id_Question")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Rditil.Models.Reponse", "ReponseChoisie")
-                        .WithMany()
-                        .HasForeignKey("ReponseChoisieId");
 
                     b.Navigation("Examen");
 
                     b.Navigation("Question");
-
-                    b.Navigation("ReponseChoisie");
                 });
 
             modelBuilder.Entity("Rditil.Models.Reponse", b =>
                 {
                     b.HasOne("Rditil.Models.Question", "Question")
                         .WithMany("Reponses")
-                        .HasForeignKey("QuestionId")
+                        .HasForeignKey("QuestionId_Question")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -200,6 +197,8 @@ namespace Rditil.Migrations
             modelBuilder.Entity("Rditil.Models.Examen", b =>
                 {
                     b.Navigation("ExamenQuestions");
+
+                    b.Navigation("Examen_Questions");
                 });
 
             modelBuilder.Entity("Rditil.Models.Question", b =>

@@ -1,49 +1,32 @@
-﻿using Rditil.Models;
-using Rditil.Views;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows;
+using System.Windows.Controls;
+using Rditil.Services;
+using Rditil.ViewModels;
 
 namespace Rditil.Views
 {
     public partial class LoginPage : Window
     {
-        public string Email { get; set; }
-        public string ErrorMessage { get; set; }
+        private LoginViewModel viewModel;
 
         public LoginPage()
         {
             InitializeComponent();
-            DataContext = this;
+            viewModel = new LoginViewModel();
+            DataContext = viewModel;
         }
 
         private void OnLoginClick(object sender, RoutedEventArgs e)
         {
-            string email = Email?.Trim();
-            string password = PasswordBox.Password;
-
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            if (viewModel.AuthenticateUser())
             {
-                ErrorMessage = "Veuillez remplir tous les champs.";
-                DataContext = null; DataContext = this;
-                return;
+                var welcomePage = new WelcomePage();
+                NavigationService.NavigateTo(this, welcomePage);
             }
-
-            var utilisateur = App.DbContext.Utilisateurs
-                .FirstOrDefault(u => u.Email == email && u.Password == password);
-
-            if (utilisateur == null)
+            else
             {
-                ErrorMessage = "Email ou mot de passe incorrect.";
-                DataContext = null; DataContext = this;
-                return;
+                MessageBox.Show("Nom d'utilisateur ou mot de passe incorrect.");
             }
-
-            App.CurrentUser = utilisateur;
-
-            // Redirection vers l'examen
-            var examPage = new ExamenView(Email);
-            examPage.Show();
-            this.Close();
         }
     }
 }

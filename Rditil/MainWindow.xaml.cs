@@ -18,7 +18,7 @@ namespace Rditil.Views
             using var context = new AppDbContext(optionsBuilder.Options);
             context.Database.Migrate(); // optionnel si tu veux migrer automatiquement
 
-            var window = new AdminPanel();
+            var window = new LoginPage();
             window.Show();
         }
     }

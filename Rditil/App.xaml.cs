@@ -13,8 +13,6 @@ namespace Rditil
         public static AppDbContext DbContext { get; private set; }
         public static Utilisateur? CurrentUser { get; set; }
 
-
-
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
