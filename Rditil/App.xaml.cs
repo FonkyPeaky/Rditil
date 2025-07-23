@@ -11,7 +11,8 @@ namespace Rditil
     public partial class App : Application
     {
         public static AppDbContext DbContext { get; private set; }
-        public static Utilisateur CurrentUser { get; set; }
+        public static Utilisateur? CurrentUser { get; set; }
+
 
 
         protected override void OnStartup(StartupEventArgs e)

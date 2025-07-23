@@ -21,6 +21,9 @@ namespace Rditil.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Examen_Question>()
+                .HasKey(eq => new { eq.Id_Examen, eq.Id_Question });
+
+            modelBuilder.Entity<Examen_Question>()
                 .HasOne(eq => eq.Examen)
                 .WithMany(e => e.ExamenQuestions)
                 .HasForeignKey(eq => eq.Id_Examen);
@@ -30,6 +33,7 @@ namespace Rditil.Data
                 .WithMany(q => q.ExamenQuestions)
                 .HasForeignKey(eq => eq.Id_Question);
         }
+
     }
 
 }

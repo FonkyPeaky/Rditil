@@ -12,16 +12,17 @@ using System.Windows.Input;
 namespace Rditil.ViewModels
 {
     public class ExamenViewModel : ViewModelBase
-    {
-        
-        private readonly EmailService _emailService;
-        private readonly string _userEmail;
-        private readonly List<Question> _questions;
+    {        
+        private readonly EmailService? _emailService;
+        private readonly string? _userEmail;
+        private readonly List<Question>? _questions;
         private int _currentQuestionIndex;
-        private Question _currentQuestion;
+        private Question? _currentQuestion;
         private int _score;
+        private List<Question> QuestionsTirees;
 
-        public Question QuestionActuelle
+
+        public Question? QuestionActuelle
         {
             get => _currentQuestion;
             set
@@ -33,12 +34,15 @@ namespace Rditil.ViewModels
 
         public int NumeroQuestionActuelle => _currentQuestionIndex + 1;
 
-        public ICommand QuestionSuivanteCommand { get; }
+        public ICommand? QuestionSuivanteCommand { get; }
 
         private void LoadCurrentQuestion()
         {
-            QuestionActuelle = _questions[_currentQuestionIndex];
-            OnPropertyChanged(nameof(NumeroQuestionActuelle));
+            if (_questions is not null)
+            {
+                QuestionActuelle = _questions[_currentQuestionIndex];
+                OnPropertyChanged(nameof(NumeroQuestionActuelle));
+            }
         }
 
         private bool CanExecuteQuestionSuivante(object? parameter)
@@ -50,7 +54,6 @@ namespace Rditil.ViewModels
         {
             try
             {
-
                 _currentQuestionIndex++;
 
                 if (_currentQuestionIndex < _questions.Count)
@@ -74,15 +77,14 @@ namespace Rditil.ViewModels
             var examResultService = new DbExamResultService(App.DbContext);
             examResultService.EnregistrerExamen(App.CurrentUser, _score, QuestionsTirees.ToList());
 
-
             // Envoyer email résultat
             try
             {
                 await _emailService.SendExamResultAsync(
-                    _userEmail,
-                    _userEmail,
-                    _score,
-                    _questions.Count
+                      _userEmail,
+                      _userEmail,
+                      _score,
+                      _questions.Count
                 );
             }
             catch

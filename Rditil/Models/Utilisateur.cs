@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Rditil.Models
 {
     public class Utilisateur
     {
+        [Key]
         public int Id_Utilisateur { get; set; }
         public string Nom { get; set; }
         public string Prenom { get; set; }

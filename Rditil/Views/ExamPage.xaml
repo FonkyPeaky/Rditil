@@ -1,0 +1,12 @@
+﻿<Window x:Class="Rditil.Views.ExamPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Examen" Height="450" Width="800">
+    <Grid>
+        <TextBlock Text="Bienvenue à l'examen"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontSize="24"
+                   FontWeight="Bold"/>
+    </Grid>
+</Window>
