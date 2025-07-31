@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Rditil.Migrations
 {
     /// <inheritdoc />
-    public partial class InitSchema : Migration
+    public partial class AddTestTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,7 +18,7 @@ namespace Rditil.Migrations
                 {
                     Id_Question = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Enonce = table.Column<string>(type: "text", nullable: false)
+                    Enonce = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -47,10 +47,10 @@ namespace Rditil.Migrations
                 {
                     Id_Reponse = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TextReponse = table.Column<string>(type: "text", nullable: false),
+                    TextReponse = table.Column<string>(type: "text", nullable: true),
                     EstCorrect = table.Column<bool>(type: "boolean", nullable: false),
                     Id_Question = table.Column<int>(type: "integer", nullable: false),
-                    QuestionId_Question = table.Column<int>(type: "integer", nullable: false)
+                    QuestionId_Question = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -59,8 +59,7 @@ namespace Rditil.Migrations
                         name: "FK_Reponses_Questions_QuestionId_Question",
                         column: x => x.QuestionId_Question,
                         principalTable: "Questions",
-                        principalColumn: "Id_Question",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id_Question");
                 });
 
             migrationBuilder.CreateTable(

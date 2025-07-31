@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using Timer = System.Timers.Timer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Rditil.ViewModels
 {
@@ -37,7 +39,7 @@ namespace Rditil.ViewModels
         {
             _emailService = emailService;
             _userEmail = userEmail;
-            _questionService = new DbQuestionService(App.DbContext);
+            _questionService = new DbQuestionService(App.AppHost.Services.GetRequiredService<Rditil.Data.AppDbContext>());
             _timer = new Timer(1000);
             SuivantCommand = new RelayCommand<object?>(PasserQuestionSuivante);
 
@@ -58,6 +60,7 @@ namespace Rditil.ViewModels
         {
             _timer.Elapsed += (s, e) =>
             {
+                // Mettre à jour le temps restant
                 _tempsRestant = _tempsRestant.Subtract(TimeSpan.FromSeconds(1));
                 TempsRestant = _tempsRestant.ToString(@"mm\:ss");
 

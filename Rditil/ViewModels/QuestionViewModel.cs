@@ -16,12 +16,12 @@ namespace Rditil.ViewModels
         private Timer _timer;
         private TimeSpan _tempsRestant;
         private int _index;
+        private string _tempsRestantAffiche;
 
         public ObservableCollection<Question> QuestionsTirees { get; set; }
         public Question QuestionEnCours { get; set; }
         public ObservableCollection<ReponseChoix> ReponsesEnCours { get; set; }
 
-        private string _tempsRestantAffiche;
         public string TempsRestantAffiche
         {
             get => _tempsRestantAffiche;

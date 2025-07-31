@@ -1,62 +1,116 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using Microsoft.EntityFrameworkCore;
 using Rditil.Data;
 using Rditil.Models;
 using Rditil.Services;
-using Rditil.Views;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Windows;
+using System.Windows.Input;
+using Microsoft.Extensions.DependencyInjection;
+using Rditil.Views;
+using Rditil.ViewModels;
+using Rditil.Services;
+using Rditil;
+
 
 namespace Rditil.ViewModels
 {
     public class LoginViewModel : INotifyPropertyChanged
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string ErrorMessage { get; set; }
-        public string Nom { get; set; }
-        public string Prenom { get; set; }
+        private readonly AppDbContext _dbContext;
+        private readonly INavigationService _navigationService;
+        
 
-        public RelayCommand LoginCommand { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        public LoginViewModel()
+        private string _email;
+        public string Email
         {
+            get => _email;
+            set
+            {
+                _email = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _password;
+        public string Password
+        {
+            get => _password;
+            set
+            {
+                _password = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _errorMessage;
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set
+            {
+                _errorMessage = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ICommand LoginCommand { get; }
+
+        public LoginViewModel(AppDbContext dbContext, INavigationService navigationService)
+        {
+            _dbContext = dbContext;
+            _navigationService = navigationService;
             LoginCommand = new RelayCommand(Login);
         }
 
-        private void Login()
+        public void Login()
         {
-            var userService = new DbUserService(App.DbContext);
+            ErrorMessage = string.Empty;
 
-            var user = userService.GetUserByEmailAndPassword(Email, Password);
-            if (user != null)
+            try
             {
-                App.CurrentUser = user;
+                string? normalizedEmail = Email?.Trim();
+                string? normalizedPassword = Password?.Trim();
 
-                var homePage = new WelcomePage();
-                NavigationService.NavigateTo(Application.Current.MainWindow, homePage);
+                Debug.WriteLine($"Tentative de login avec : Email = '{normalizedEmail}', Password = '{normalizedPassword}'");
+
+                var user = _dbContext.Utilisateurs
+                    .AsNoTracking()
+                    .FirstOrDefault(u => u.Email == normalizedEmail && u.Password == normalizedPassword);
+
+                if (user != null)
+                {
+
+                    App.CurrentUser = user;
+                    Debug.WriteLine($"✔ Connexion réussie : {user.Nom} {user.Prenom}");
+                    _navigationService.NavigateTo<WelcomeViewModel>();
+                }
+                else
+                {
+                    Debug.WriteLine("❌ Utilisateur non trouvé ou mot de passe incorrect.");
+                    ErrorMessage = "Nom d'utilisateur ou mot de passe incorrect.";
+                }
             }
-            else
+            catch (Exception ex)
             {
-                ErrorMessage = "Email ou mot de passe incorrect.";
-                OnPropertyChanged(nameof(ErrorMessage));
+                Debug.WriteLine($"⚠ Erreur lors du login : {ex.Message}");
+                ErrorMessage = "Erreur de connexion.";
             }
         }
 
-        public bool AuthenticateUser()
-        {
-            using (var context = new AppDbContextFactory().CreateDbContext(null))
-            {
-                return context.Utilisateurs.Any(u =>
-                    u.Email == Email && u.Password == Password);
-            }
-        }
 
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string prop = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
-        }
+
+
+
+
+
+
+
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

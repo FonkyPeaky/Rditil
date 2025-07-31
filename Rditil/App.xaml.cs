@@ -1,40 +1,50 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Rditil;
 using Rditil.Data;
 using Rditil.Models;
-using System;
-using System.IO;
+using Rditil.Services;
+using Rditil.ViewModels;
+using Rditil.Views;
 using System.Windows;
+
 
 namespace Rditil
 {
     public partial class App : Application
     {
-        public static AppDbContext DbContext { get; private set; }
-        public static Utilisateur? CurrentUser { get; set; }
+        public static IHost AppHost { get; private set; }
+
+        // 🔧 AJOUTER CETTE PROPRIÉTÉ :
+        public static Utilisateur CurrentUser { get; set; }
+
+        public App()
+        {
+            AppHost = Host.CreateDefaultBuilder()
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddDbContext<AppDbContext>(options =>
+                        options.UseNpgsql(ConfigHelper.LoadConfiguration().GetConnectionString("DefaultConnection")));
+
+                    services.AddSingleton<MainWindow>();
+                    services.AddTransient<LoginPage>();
+                    services.AddTransient<LoginViewModel>();
+                    services.AddTransient<WelcomePage>();
+                    services.AddTransient<WelcomeViewModel>();
+                    services.AddSingleton<INavigationService, NavigationService>();
+                })
+                .Build();
+        }
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            base.OnStartup(e);
-
-            // Charger la configuration depuis appsettings.json
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
-
-            // Configurer le DbContext PostgreSQL
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
-
-            DbContext = new AppDbContext(optionsBuilder.Options);
-
-            // Initialiser la base de données (facultatif : migrations ou EnsureCreated)
-            DbContext.Database.EnsureCreated(); // ou .Migrate()
-
-            // Lancer la première fenêtre (ex: LoginPage)
-            var mainWindow = new Views.LoginPage(); // ou MainWindow, selon ta logique
+            AppHost.Start();
+            var mainWindow = AppHost.Services.GetRequiredService<MainWindow>();
             mainWindow.Show();
+            base.OnStartup(e);
         }
     }
+
 }

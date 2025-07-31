@@ -10,6 +10,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Rditil.Views
@@ -17,17 +18,11 @@ namespace Rditil.Views
     /// <summary>
     /// Interaction logic for WelcomePage.xaml
     /// </summary>
-    public partial class WelcomePage : Window
+    public partial class WelcomePage : Page
     {
         public WelcomePage()
         {
             InitializeComponent();
-        }
-        public void StartExam_Click(object sender, RoutedEventArgs e)
-        {
-            var examWindow = new ExamenView(App.CurrentUser.Email);
-            examWindow.Show();
-            this.Close();
         }
     }
 }

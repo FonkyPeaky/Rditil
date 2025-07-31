@@ -2,6 +2,8 @@ using CommunityToolkit.Mvvm.Input;
 using Rditil.Models;
 using Rditil.Services;
 using Rditil.Views;
+using Rditil.ViewModels;
+using Rditil.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +14,15 @@ using System.Windows.Input;
 namespace Rditil.ViewModels
 {
     public class ExamenViewModel : ViewModelBase
-    {        
+    {
+        public static object CurrentUser;
         private readonly EmailService? _emailService;
         private readonly string? _userEmail;
         private readonly List<Question>? _questions;
         private int _currentQuestionIndex;
         private Question? _currentQuestion;
         private int _score;
-        private List<Question> QuestionsTirees;
+        private List<Question>? QuestionsTirees;
 
 
         public Question? QuestionActuelle
@@ -73,8 +76,10 @@ namespace Rditil.ViewModels
 
         private async Task FinirExamenAsync()
         {
+            var dbContext = (App.AppHost?.Services.GetService(typeof(AppDbContext)) as AppDbContext)
+                ?? throw new InvalidOperationException("DbContext is not available.");
 
-            var examResultService = new DbExamResultService(App.DbContext);
+            var examResultService = new DbExamResultService(dbContext);
             examResultService.EnregistrerExamen(App.CurrentUser, _score, QuestionsTirees.ToList());
 
             // Envoyer email résultat

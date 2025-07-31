@@ -12,8 +12,8 @@ using Rditil.Data;
 namespace Rditil.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250723143601_InitSchema")]
-    partial class InitSchema
+    [Migration("20250728121530_AddTestTable")]
+    partial class AddTestTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -84,7 +84,6 @@ namespace Rditil.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id_Question"));
 
                     b.Property<string>("Enonce")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id_Question");
@@ -106,11 +105,10 @@ namespace Rditil.Migrations
                     b.Property<int>("Id_Question")
                         .HasColumnType("integer");
 
-                    b.Property<int>("QuestionId_Question")
+                    b.Property<int?>("QuestionId_Question")
                         .HasColumnType("integer");
 
                     b.Property<string>("TextReponse")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id_Reponse");
@@ -124,25 +122,30 @@ namespace Rditil.Migrations
                 {
                     b.Property<int>("Id_Utilisateur")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("Id_Utilisateur");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id_Utilisateur"));
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("Email");
 
                     b.Property<string>("Nom")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("Nom");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("Password");
 
                     b.Property<string>("Prenom")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("Prenom");
 
                     b.HasKey("Id_Utilisateur");
 
@@ -152,7 +155,7 @@ namespace Rditil.Migrations
             modelBuilder.Entity("Rditil.Models.Examen", b =>
                 {
                     b.HasOne("Rditil.Models.Utilisateur", "Utilisateur")
-                        .WithMany("Examens")
+                        .WithMany()
                         .HasForeignKey("UtilisateurId_Utilisateur")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -187,9 +190,7 @@ namespace Rditil.Migrations
                 {
                     b.HasOne("Rditil.Models.Question", "Question")
                         .WithMany("Reponses")
-                        .HasForeignKey("QuestionId_Question")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("QuestionId_Question");
 
                     b.Navigation("Question");
                 });
@@ -206,11 +207,6 @@ namespace Rditil.Migrations
                     b.Navigation("ExamenQuestions");
 
                     b.Navigation("Reponses");
-                });
-
-            modelBuilder.Entity("Rditil.Models.Utilisateur", b =>
-                {
-                    b.Navigation("Examens");
                 });
 #pragma warning restore 612, 618
         }

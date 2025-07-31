@@ -12,8 +12,6 @@ namespace Rditil.Views
         {
             InitializeComponent();
 
-            
-
             var settings = new SmtpSettings
             {
                 Server = "smtp.example.com",
@@ -25,8 +23,6 @@ namespace Rditil.Views
             };
 
             var emailService = new EmailService(settings);
-
-            
         }
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

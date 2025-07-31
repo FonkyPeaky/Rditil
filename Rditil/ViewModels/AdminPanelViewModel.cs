@@ -9,9 +9,9 @@ namespace Rditil.ViewModels
     public class AdminPanelViewModel : ViewModelBase
     {
         
-        private Utilisateur _nouvelUtilisateur;
+        private Utilisateur? _nouvelUtilisateur;
 
-        public Utilisateur NouvelUtilisateur
+        public Utilisateur? NouvelUtilisateur
         {
             get => _nouvelUtilisateur;
             set
@@ -21,7 +21,7 @@ namespace Rditil.ViewModels
             }
         }
 
-        public ICommand AjouterCommand { get; }
+        public ICommand? AjouterCommand { get; }
 
         /*public AdminPanelViewModel(IExcelService excelService)
         {
