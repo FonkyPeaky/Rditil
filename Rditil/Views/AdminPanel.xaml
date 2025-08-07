@@ -1,9 +1,7 @@
-﻿<Window x:Class="Rditil.Views.AdminPanel"
+﻿<Page x:Class="Rditil.Views.AdminPanel"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="AdminPanel"
-        WindowStyle="None"
-        AllowsTransparency="True"
         Background="Transparent"
         Width="600"
         Height="600"
@@ -79,15 +77,15 @@
 
                     <!-- Ajouter -->
                     <Button Content="Ajouter"
-                            Command="{Binding AjouterCommand}"
+                            Command="{Binding AddUserCommand}"
                             Background="#6C63FF"
                             Foreground="White"
                             FontWeight="Bold"
                             Padding="10"
                             BorderBrush="Transparent"
-                            Cursor="Hand"/>
+                            Cursor="Hand" Click="AddUserButton_Click"/>
                 </StackPanel>
             </Border>
         </Grid>
     </Border>
-</Window>
+</Page>

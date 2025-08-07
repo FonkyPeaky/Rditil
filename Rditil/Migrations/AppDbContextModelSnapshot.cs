@@ -124,6 +124,10 @@ namespace Rditil.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id_Utilisateur"));
 
+                    b.Property<DateTime>("DernierExamen")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("DernierExamen");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text")
@@ -143,6 +147,10 @@ namespace Rditil.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("Prenom");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("integer")
+                        .HasColumnName("Score");
 
                     b.HasKey("Id_Utilisateur");
 

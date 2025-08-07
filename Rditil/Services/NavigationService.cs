@@ -1,17 +1,19 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Rditil.Services;
 using Rditil.ViewModels;
 using Rditil.Views;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
-using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Rditil.Services
 {
     public class NavigationService : INavigationService
     {
+        
         private Frame _mainFrame;
         private readonly IServiceProvider _serviceProvider;
 
@@ -36,10 +38,15 @@ namespace Rditil.Services
                 throw new InvalidOperationException($"ViewModel {typeof(TViewModel).Name} is not registered in DI.");
 
             var pageType = ViewModelPageMapper.GetPageTypeForViewModel(typeof(TViewModel));
-            var page = (Page)_serviceProvider.GetService(pageType); // ✅
+            var pageObj = _serviceProvider.GetService(pageType);
+
+            if (pageObj is not Page page)
+                throw new InvalidCastException($"The resolved type {pageType.Name} is not a Page.");
+
             page.DataContext = viewModel;
             _mainFrame.Navigate(page);
         }
 
     }
 }
+

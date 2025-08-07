@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         Title="Fin de l'examen" Height="350" Width="500" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid Margin="30">
-        <Grid.RowDefinitions>
+        <Grid.RowDefinitions> 
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>

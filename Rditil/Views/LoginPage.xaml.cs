@@ -20,6 +20,9 @@ namespace Rditil.Views
 
         private void OnLoginClick(object sender, RoutedEventArgs e)
         {
+
+
+
             if (DataContext is LoginViewModel viewModel)
             {
                 viewModel.Password = PasswordBox.Password; // obligatoire, non lié par Binding

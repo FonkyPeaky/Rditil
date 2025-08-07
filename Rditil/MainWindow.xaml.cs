@@ -23,6 +23,7 @@ namespace Rditil
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    ///
 
     public partial class MainWindow : Window
     {
@@ -33,7 +34,7 @@ namespace Rditil
             var navigationService = App.AppHost.Services.GetRequiredService<INavigationService>();
             navigationService.SetFrame(MainFrame);
             navigationService.NavigateTo<LoginViewModel>();
+            //navigationService.NavigateTo<AdminPanel>();
         }
     }
-
 }

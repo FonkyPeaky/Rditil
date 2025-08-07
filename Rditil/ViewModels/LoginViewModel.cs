@@ -6,11 +6,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using Microsoft.Extensions.DependencyInjection;
-using Rditil.Views;
 using Rditil.ViewModels;
-using Rditil.Services;
-using Rditil;
+using BCrypt.Net;
 
 
 namespace Rditil.ViewModels
@@ -19,7 +16,7 @@ namespace Rditil.ViewModels
     {
         private readonly AppDbContext _dbContext;
         private readonly INavigationService _navigationService;
-        
+        public ICommand NavigateToAdminCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -27,33 +24,21 @@ namespace Rditil.ViewModels
         public string Email
         {
             get => _email;
-            set
-            {
-                _email = value;
-                OnPropertyChanged();
-            }
+            set { _email = value; OnPropertyChanged(); }
         }
 
         private string _password;
         public string Password
         {
             get => _password;
-            set
-            {
-                _password = value;
-                OnPropertyChanged();
-            }
+            set { _password = value; OnPropertyChanged(); }
         }
 
         private string _errorMessage;
         public string ErrorMessage
         {
             get => _errorMessage;
-            set
-            {
-                _errorMessage = value;
-                OnPropertyChanged();
-            }
+            set { _errorMessage = value; OnPropertyChanged(); }
         }
 
         public ICommand LoginCommand { get; }
@@ -63,6 +48,8 @@ namespace Rditil.ViewModels
             _dbContext = dbContext;
             _navigationService = navigationService;
             LoginCommand = new RelayCommand(Login);
+            NavigateToAdminCommand = new RelayCommand(NavigateToAdmin);
+
         }
 
         public void Login()
@@ -71,46 +58,41 @@ namespace Rditil.ViewModels
 
             try
             {
-                string? normalizedEmail = Email?.Trim();
-                string? normalizedPassword = Password?.Trim();
+                string normalizedEmail = Email?.Trim();
+                string inputPassword = Password?.Trim();
 
-                Debug.WriteLine($"Tentative de login avec : Email = '{normalizedEmail}', Password = '{normalizedPassword}'");
+                Debug.WriteLine($"Tentative de login : {normalizedEmail}");
 
                 var user = _dbContext.Utilisateurs
                     .AsNoTracking()
-                    .FirstOrDefault(u => u.Email == normalizedEmail && u.Password == normalizedPassword);
+                    .FirstOrDefault(u => u.Email == normalizedEmail);
 
-                if (user != null)
+                if (user != null && BCrypt.Net.BCrypt.Verify(inputPassword, user.Password))
                 {
-
                     App.CurrentUser = user;
-                    Debug.WriteLine($"✔ Connexion réussie : {user.Nom} {user.Prenom}");
                     _navigationService.NavigateTo<WelcomeViewModel>();
+                    Debug.WriteLine($"✔ Connexion réussie : {user.Nom} {user.Prenom}");
                 }
                 else
                 {
-                    Debug.WriteLine("❌ Utilisateur non trouvé ou mot de passe incorrect.");
                     ErrorMessage = "Nom d'utilisateur ou mot de passe incorrect.";
+                    Debug.WriteLine("❌ Authentification échouée.");
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"⚠ Erreur lors du login : {ex.Message}");
                 ErrorMessage = "Erreur de connexion.";
+                Debug.WriteLine($"⚠ Erreur : {ex.Message}");
             }
         }
 
+        private void NavigateToAdmin()
+        {
+            _navigationService.NavigateTo<AdminPanelViewModel>();
+        }
 
 
-
-
-
-
-
-
-
-
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        protected void OnPropertyChanged([CallerMemberName] string name = null) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

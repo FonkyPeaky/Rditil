@@ -21,5 +21,12 @@ namespace Rditil.Models
 
         [Column("Password")]
         public string Password { get; set; }
+
+        [Column("Score")]
+        public int Score { get; set; } = 0;
+
+        [Column("DernierExamen")]
+        public DateTime DernierExamen { get; set; } = DateTime.UtcNow;
+
     }
 }

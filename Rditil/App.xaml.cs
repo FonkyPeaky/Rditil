@@ -33,6 +33,8 @@ namespace Rditil
                     services.AddTransient<LoginViewModel>();
                     services.AddTransient<WelcomePage>();
                     services.AddTransient<WelcomeViewModel>();
+                    services.AddTransient<AdminPanel>();
+                    services.AddTransient<AdminPanelViewModel>();
                     services.AddSingleton<INavigationService, NavigationService>();
                 })
                 .Build();

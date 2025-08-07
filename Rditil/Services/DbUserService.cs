@@ -15,8 +15,7 @@ namespace Rditil.Services
 
         public Utilisateur GetUserByEmailAndPassword(string email, string password)
         {
-            return _context.Utilisateurs
-                .FirstOrDefault(u => u.Email == email && u.Password == password);
+            return _context.Utilisateurs.FirstOrDefault(u => u.Email == email && u.Password == password);
         }
 
         public bool EmailExists(string email)

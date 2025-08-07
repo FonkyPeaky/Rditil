@@ -14,6 +14,7 @@ namespace Rditil.Services
         {
             { typeof(LoginViewModel), typeof(LoginPage) },
             { typeof(WelcomeViewModel), typeof(WelcomePage) },
+            { typeof(AdminPanelViewModel), typeof(AdminPanel) } 
         };
 
         public static Type GetPageTypeForViewModel(Type viewModelType)
