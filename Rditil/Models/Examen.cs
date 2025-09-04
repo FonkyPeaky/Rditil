@@ -8,16 +8,16 @@ namespace Rditil.Models
     {
         [Key]
         public int Id_Examen { get; set; }
-        public ICollection<Examen_Question> ExamenQuestions { get; set; }
 
         public DateTime DateExamen { get; set; }
+
         public TimeSpan DureeExamen { get; set; }
-        public int SCORE { get; set; }
 
-        // Navigation
+        public int Score { get; set; }
+
         public int Id_Utilisateur { get; set; }
-        public Utilisateur Utilisateur { get; set; }
+        public Utilisateur Utilisateur { get; set; } = null!;
 
-        public ICollection<Examen_Question> Examen_Questions { get; set; }
+        public ICollection<Examen_Question> ExamenQuestions { get; set; } = new List<Examen_Question>();
     }
 }

@@ -17,6 +17,12 @@ namespace Rditil.Views
         {
             Application.Current.Shutdown();
         }
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (Resources["EnterStoryboard"] is System.Windows.Media.Animation.Storyboard sb)
+                sb.Begin();
+        }
+
 
     }
 }

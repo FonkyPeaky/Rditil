@@ -1,52 +1,63 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
-using Rditil.Services;
-using Rditil.ViewModels;
-using Rditil.Views;
-using System;
-using System.Windows;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Windows.Controls;
-using System.Windows.Navigation;
-
+using Microsoft.Extensions.DependencyInjection;
+using Rditil.Navigation; // pour ViewModelPageMapper
 
 namespace Rditil.Services
 {
-    public class NavigationService : INavigationService
+
+    public sealed class NavigationService : INavigationService
     {
-        
-        private Frame _mainFrame;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IServiceProvider _sp;
+        private Frame? _frame;
 
-        public NavigationService(IServiceProvider serviceProvider)
+        public NavigationService(IServiceProvider sp)
         {
-            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _sp = sp;
         }
 
-        public void SetFrame(Frame frame)
+        public void SetFrame(Frame frame) => _frame = frame;
+
+        // Implémente la signature attendue par TON interface
+        public void NavigateTo<TViewModel>(Dictionary<string, object?>? parameters = null) where TViewModel : class
         {
-            _mainFrame = frame;
+            NavigateTo(typeof(TViewModel), parameters);
         }
 
-        public void NavigateTo<TViewModel>(Dictionary<string, object> parameters = null)
-            where TViewModel : class
+
+        // Surcharge interne pratique (ta/ton interface n'a pas besoin de la déclarer)
+        private void NavigateTo(Type viewModelType, Dictionary<string, object?>? parameters = null)
         {
-            if (_mainFrame == null)
-                throw new InvalidOperationException("Main frame has not been set.");
+            if (_frame is null)
+                throw new InvalidOperationException("Frame non initialisée. Appelle SetFrame() avant NavigateTo().");
 
-            var viewModel = _serviceProvider.GetService<TViewModel>();
-            if (viewModel == null)
-                throw new InvalidOperationException($"ViewModel {typeof(TViewModel).Name} is not registered in DI.");
+            // 1) Trouver la Page associée à la VM
+            var pageType = ViewModelPageMapper.GetPageType(viewModelType);
 
-            var pageType = ViewModelPageMapper.GetPageTypeForViewModel(typeof(TViewModel));
-            var pageObj = _serviceProvider.GetService(pageType);
+            // 2) Résoudre la VM via DI
+            var vm = _sp.GetRequiredService(viewModelType);
 
-            if (pageObj is not Page page)
-                throw new InvalidCastException($"The resolved type {pageType.Name} is not a Page.");
+            // 3) Appliquer les 'parameters' sur la VM si fournis (property bag)
+            if (parameters is not null)
+            {
+                foreach (var (key, value) in parameters)
+                {
+                    var prop = viewModelType.GetProperty(key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
+                    if (prop is { CanWrite: true })
+                    {
+                        prop.SetValue(vm, value);
+                    }
+                }
+            }
 
-            page.DataContext = viewModel;
-            _mainFrame.Navigate(page);
+            // 4) Créer la Page et fixer DataContext
+            var page = (Page?)ActivatorUtilities.CreateInstance(_sp, pageType);
+            if (page is null) throw new InvalidOperationException($"Impossible d'instancier {pageType.Name}");
+
+            page.DataContext = vm;
+            _frame.Navigate(page);
         }
-
     }
 }
-

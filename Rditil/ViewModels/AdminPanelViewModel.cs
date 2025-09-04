@@ -29,8 +29,8 @@ namespace Rditil.ViewModels
         {
             
             _dbContext = dbContext;
-            AjouterCommand = new RelayCommand(ExecuteAjouter);
-            AddUserCommand = new RelayCommand(AddUser);
+            //AjouterCommand = new RelayCommand(ExecuteAjouter);
+            //AddUserCommand = new RelayCommand(AddUser);
 
         }
 
@@ -58,7 +58,7 @@ namespace Rditil.ViewModels
                 }
 
                 // Hash du mot de passe
-                NouvelUtilisateur.Password = PasswordHelper.HashPassword(MotDePasse);
+                NouvelUtilisateur.PasswordHash = PasswordHelper.HashPassword(MotDePasse);
 
                 // ✅ Valeurs par défaut nécessaires
                 NouvelUtilisateur.Score = 0;
@@ -85,9 +85,9 @@ namespace Rditil.ViewModels
         {
             try
             {
-                if (!string.IsNullOrWhiteSpace(NewUser.Password))
+                if (!string.IsNullOrWhiteSpace(NewUser.PasswordHash))
                 {
-                    NewUser.Password = BCrypt.Net.BCrypt.HashPassword(NewUser.Password);
+                    NewUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(NewUser.PasswordHash);
                     NewUser.DernierExamen = DateTime.UtcNow;
                     NewUser.Score = 0;
 

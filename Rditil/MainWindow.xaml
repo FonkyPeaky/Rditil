@@ -1,6 +1,9 @@
 ﻿<Window x:Class="Rditil.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Rditil" Height="600" Width="800">
-    <Frame x:Name="MainFrame"/>
+        Title="Rditil" Height="600" Width="900"
+        Loaded="Window_Loaded">
+    <Grid>
+        <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>
+    </Grid>
 </Window>

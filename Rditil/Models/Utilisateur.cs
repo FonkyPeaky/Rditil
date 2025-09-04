@@ -1,32 +1,30 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Rditil.Models
 {
-    [Table("Utilisateurs")]
     public class Utilisateur
     {
         [Key]
-        [Column("Id_Utilisateur")]
         public int Id_Utilisateur { get; set; }
 
-        [Column("Nom")]
-        public string Nom { get; set; }
+        [Required, MaxLength(100)]
+        public string Nom { get; set; } = "";
 
-        [Column("Prenom")]
-        public string Prenom { get; set; }
+        [Required, MaxLength(100)]
+        public string Prenom { get; set; } = "";
 
-        [Column("Email")]
-        public string Email { get; set; }
+        [Required, EmailAddress, MaxLength(255)]
+        public string Email { get; set; } = "";
 
-        [Column("Password")]
-        public string Password { get; set; }
+        [Required]
+        public string PasswordHash { get; set; } = "";
 
-        [Column("Score")]
+        [EmailAddress, MaxLength(255)]
+        public string? EmailNPlus1 { get; set; }
+
         public int Score { get; set; } = 0;
 
-        [Column("DernierExamen")]
         public DateTime DernierExamen { get; set; } = DateTime.UtcNow;
-
     }
 }

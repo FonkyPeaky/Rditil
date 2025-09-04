@@ -1,12 +1,9 @@
-﻿using Rditil.ViewModels;
-using Rditil.Views;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Rditil.Views;
+using Rditil.ViewModels;
 
-namespace Rditil.Services
+namespace Rditil.Navigation
 {
     public static class ViewModelPageMapper
     {
@@ -14,14 +11,15 @@ namespace Rditil.Services
         {
             { typeof(LoginViewModel), typeof(LoginPage) },
             { typeof(WelcomeViewModel), typeof(WelcomePage) },
-            { typeof(AdminPanelViewModel), typeof(AdminPanel) } 
+            { typeof(AdminPanelViewModel), typeof(AdminPanel) },
+            { typeof(ExamenViewModel), typeof(ExamenView) },
+            { typeof(QuestionViewModel), typeof(QuestionPage) },
+            { typeof(ResultViewModel), typeof(EndPage) },
         };
 
-        public static Type GetPageTypeForViewModel(Type viewModelType)
-        {
-            return Map.TryGetValue(viewModelType, out var pageType)
-                ? pageType
-                : throw new ArgumentException($"No page found for {viewModelType.Name}");
-        }
+        public static Type GetPageType(Type viewModelType) =>
+            Map.TryGetValue(viewModelType, out var page)
+                ? page
+                : throw new InvalidOperationException($"Page non trouvée pour {viewModelType.Name}");
     }
 }

@@ -1,45 +1,36 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Rditil.Models;
-using Rditil.ViewModels;
-using System.Diagnostics;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
+using System.Windows.Media.Animation;
+using Rditil.ViewModels;
 
 namespace Rditil.Views
 {
-    public partial class AdminPanel : Page // Ensure this matches the base class in all partial declarations
+    public partial class AdminPanel : Page
     {
         public AdminPanel()
         {
             InitializeComponent();
         }
 
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            Application.Current.Shutdown(); // Fixed: Removed 'this.Close()' as 'Page' does not have a 'Close' method.
-        }
-
-        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-
+            if (Resources["EnterStoryboard"] is Storyboard sb)
+                sb.Begin();
         }
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
-
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            // Placeholder for button click logic.
+            if (DataContext is AdminPanelViewModel vm && sender is PasswordBox pb)
+            {
+                vm.MotDePasse = pb.Password;
+            }
         }
 
         private void AddUserButton_Click(object sender, RoutedEventArgs e)
         {
-            if (DataContext is AdminPanelViewModel vm)
+            if (DataContext is AdminPanelViewModel vm && PasswordBox != null)
             {
-                vm.NewUser.Password = PasswordBox.Password;
+                vm.MotDePasse = PasswordBox.Password;
             }
         }
     }

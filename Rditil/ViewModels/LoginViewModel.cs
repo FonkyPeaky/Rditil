@@ -1,22 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Rditil.Data;
-using Rditil.Models;
-using Rditil.Services;
-using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Input;
-using Rditil.ViewModels;
-using BCrypt.Net;
-
+using CommunityToolkit.Mvvm.Input;                 // <- Toolkit
+using Rditil.Services;
 
 namespace Rditil.ViewModels
 {
     public class LoginViewModel : INotifyPropertyChanged
     {
-        private readonly AppDbContext _dbContext;
+        private readonly IUserService _userService;
         private readonly INavigationService _navigationService;
-        public ICommand NavigateToAdminCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -41,48 +35,35 @@ namespace Rditil.ViewModels
             set { _errorMessage = value; OnPropertyChanged(); }
         }
 
-        public ICommand LoginCommand { get; }
+        // Commands (types Toolkit)
+        public IAsyncRelayCommand LoginCommand { get; }
+        public IRelayCommand CreateAccountCommand { get; }
 
-        public LoginViewModel(AppDbContext dbContext, INavigationService navigationService)
+        public LoginViewModel(IUserService userService, INavigationService navigationService)
         {
-            _dbContext = dbContext;
+            _userService = userService;
             _navigationService = navigationService;
-            LoginCommand = new RelayCommand(Login);
-            NavigateToAdminCommand = new RelayCommand(NavigateToAdmin);
 
+            // ✅ force l’AsyncRelayCommand du Toolkit, overload sans paramètre
+            LoginCommand = new CommunityToolkit.Mvvm.Input.AsyncRelayCommand(LoginAsync);
+
+            // ✅ commande sync
+            CreateAccountCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(NavigateToAdmin);
         }
 
-        public void Login()
+        private async Task LoginAsync()
         {
             ErrorMessage = string.Empty;
 
-            try
+            var user = await _userService.GetByEmailAsync(Email);
+            if (user != null && BCrypt.Net.BCrypt.Verify(Password, user.PasswordHash))
             {
-                string normalizedEmail = Email?.Trim();
-                string inputPassword = Password?.Trim();
-
-                Debug.WriteLine($"Tentative de login : {normalizedEmail}");
-
-                var user = _dbContext.Utilisateurs
-                    .AsNoTracking()
-                    .FirstOrDefault(u => u.Email == normalizedEmail);
-
-                if (user != null && BCrypt.Net.BCrypt.Verify(inputPassword, user.Password))
-                {
-                    App.CurrentUser = user;
-                    _navigationService.NavigateTo<WelcomeViewModel>();
-                    Debug.WriteLine($"✔ Connexion réussie : {user.Nom} {user.Prenom}");
-                }
-                else
-                {
-                    ErrorMessage = "Nom d'utilisateur ou mot de passe incorrect.";
-                    Debug.WriteLine("❌ Authentification échouée.");
-                }
+                App.CurrentUser = user;
+                _navigationService.NavigateTo<WelcomeViewModel>();
             }
-            catch (Exception ex)
+            else
             {
-                ErrorMessage = "Erreur de connexion.";
-                Debug.WriteLine($"⚠ Erreur : {ex.Message}");
+                ErrorMessage = "Email ou mot de passe incorrect.";
             }
         }
 
@@ -90,7 +71,6 @@ namespace Rditil.ViewModels
         {
             _navigationService.NavigateTo<AdminPanelViewModel>();
         }
-
 
         protected void OnPropertyChanged([CallerMemberName] string name = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

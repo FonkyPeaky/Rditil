@@ -1,44 +1,33 @@
-﻿using Rditil.Models;
-using Rditil.Services;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Rditil.Services;
-using Rditil.Views;
-using Rditil.ViewModels;
+using Rditil.Models;
 
 namespace Rditil.ViewModels
 {
+    public interface INavigable
+    {
+        void OnNavigatedTo(Dictionary<string, object>? parameters = null);
+    }
+
     public class WelcomeViewModel : INotifyPropertyChanged, INavigable
     {
-        private string _nomUtilisateur;
-        public static object CurrentUser;
+        private string _nomUtilisateur = "Utilisateur";
         public string NomUtilisateur
         {
             get => _nomUtilisateur;
-            set
-            {
-                _nomUtilisateur = value;
-                OnPropertyChanged();
-            }
+            set { _nomUtilisateur = value; OnPropertyChanged(); }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string? name = null) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-        // Cette méthode est appelée automatiquement après la navigation
-        public void OnNavigatedTo(Dictionary<string, object> parameters = null)
+        public void OnNavigatedTo(Dictionary<string, object>? parameters = null)
         {
-            
-            if (App.CurrentUser != null)
-            {
-                NomUtilisateur = App.CurrentUser.Prenom;
-            }
-            else
-            {
-                NomUtilisateur = "Utilisateur";
-            }
+            // Récupère depuis App.CurrentUser (défini dans App.xaml.cs)
+            var u = App.CurrentUser;
+            NomUtilisateur = u?.Prenom ?? "Utilisateur";
         }
     }
 }

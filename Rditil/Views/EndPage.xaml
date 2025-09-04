@@ -1,42 +1,136 @@
 ﻿<Window x:Class="Rditil.Views.EndPage"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
-        Title="Fin de l'examen" Height="350" Width="500" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
-    <Grid Margin="30">
-        <Grid.RowDefinitions> 
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        Title="Rditil – Résultats"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Width="720" Height="460"
+        Loaded="Window_Loaded">
 
-        <!-- HEADER -->
-        <TextBlock Text="Examen terminé !"
-                   FontSize="24" FontWeight="Bold" TextAlignment="Center"
-                   HorizontalAlignment="Center" Margin="0 10" />
+    <Window.Resources>
+        <!-- Dégradé clair (même palette que l’AdminPanel) -->
+        <LinearGradientBrush x:Key="GradientBg" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#F0F8FF" Offset="0"/>
+            <GradientStop Color="#D6E9FF" Offset="1"/>
+        </LinearGradientBrush>
 
-        <!-- BODY -->
-        <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock Text="Félicitations {Binding App.CurrentUser.Prenom} !" 
-                       FontSize="18" FontWeight="SemiBold" Margin="0 10" />
+        <DropShadowEffect x:Key="SoftShadow" Color="#000000"
+                          BlurRadius="18" ShadowDepth="0" Opacity="0.25"/>
 
-            <TextBlock Text="Votre score : {Binding Score}/40"
-                       FontSize="20" FontWeight="Bold" Margin="0 5"/>
+        <!-- Bouton primaire bleu -->
+        <Style TargetType="Button" x:Key="PrimaryButton">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="10" Background="#3A8DFF" Padding="12,8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#1E70E8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-            <TextBlock Text="Soit {Binding Pourcentage}% de bonnes réponses"
-                       FontSize="16" Margin="0 5"/>
+        <!-- Bouton secondaire blanc bordé -->
+        <Style TargetType="Button" x:Key="SecondaryButton" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Foreground" Value="#1E70E8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="10" Background="White" Padding="12,8"
+                                BorderBrush="#1E70E8" BorderThickness="1.2">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-            <TextBlock Text="Un email avec vos résultats vous a été envoyé."
-                       FontSize="14" FontStyle="Italic" Margin="0 20 0 10"/>
+        <!-- Animation d’entrée -->
+        <Storyboard x:Key="EnterStoryboard">
+            <DoubleAnimation Storyboard.TargetName="Card"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0" To="1" Duration="0:0:0.4"/>
+            <DoubleAnimation Storyboard.TargetName="CardTranslate"
+                             Storyboard.TargetProperty="Y"
+                             From="15" To="0" Duration="0:0:0.4"/>
+        </Storyboard>
+    </Window.Resources>
 
-            <Button Content="Quitter" Width="150" Height="40" FontSize="16" Click="Quitter_Click"/>
-        </StackPanel>
+    <!-- ⬇️ on met le gradient sur le Grid, pas sur la Window -->
+    <Grid Background="{StaticResource GradientBg}">
+        <!-- Carte centrale -->
+        <Border x:Name="Card"
+                Width="560"
+                Padding="28"
+                CornerRadius="16"
+                Background="White"
+                Effect="{StaticResource SoftShadow}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Opacity="0"
+                RenderTransformOrigin="0.5,0.5">
+            <Border.RenderTransform>
+                <TranslateTransform x:Name="CardTranslate" Y="15"/>
+            </Border.RenderTransform>
 
-        <!-- FOOTER -->
-        <TextBlock Grid.Row="2" Text="Merci d'avoir participé !" 
-                   FontSize="14" FontStyle="Italic"
-                   HorizontalAlignment="Center" Margin="0 20 0 0"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                    <TextBlock Text="🎉 Bravo !" FontSize="24" FontWeight="Bold" Foreground="#003366"/>
+                    <TextBlock Text="Voici le récapitulatif de votre session."
+                               Foreground="#5A6B84" Margin="0,4,0,0"/>
+                </StackPanel>
+
+                <!-- Contenu : à binder à ton VM -->
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,8">
+                        <TextBlock Text="Nom :" Width="140" Foreground="#6A7A90"/>
+                        <TextBlock Text="{Binding Utilisateur.Nom}" FontWeight="SemiBold" Foreground="#003366"/>
+                        <TextBlock Text=" " />
+                        <TextBlock Text="{Binding Utilisateur.Prenom}" FontWeight="SemiBold" Foreground="#003366"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,4,0,8">
+                        <TextBlock Text="Score :" Width="140" Foreground="#6A7A90"/>
+                        <TextBlock Text="{Binding Score}" FontWeight="SemiBold" Foreground="#003366"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="0,4,0,8">
+                        <TextBlock Text="Dernier examen :" Width="140" Foreground="#6A7A90"/>
+                        <TextBlock Text="{Binding DernierExamen, StringFormat={}{0:dd/MM/yyyy HH:mm}}"
+                                   FontWeight="SemiBold" Foreground="#003366"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Actions (sans Spacing en WPF) -->
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+                    <Button Content="Fermer" Style="{StaticResource SecondaryButton}"
+                            Click="Quitter_Click" Margin="0,0,10,0"/>
+                    <Button Content="Refaire un test" Style="{StaticResource PrimaryButton}"
+                            Command="{Binding RestartCommand}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

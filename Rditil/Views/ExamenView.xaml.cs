@@ -12,17 +12,17 @@ namespace Rditil.Views
         {
             InitializeComponent();
 
-            var settings = new SmtpSettings
-            {
-                Server = "smtp.example.com",
-                Port = 587,
-                Username = "your_username",
-                Password = "your_password",
-                FromEmail = "noreply@example.com",
-                EnableSsl = true
-            };
+            //var settings = new SmtpSettings
+            //{
+            //    Server = "smtp.example.com",
+            //    Port = 587,
+            //    Username = "your_username",
+            //    Password = "your_password",
+            //    FromEmail = "noreply@example.com",
+            //    EnableSsl = true
+            //};
 
-            var emailService = new EmailService(settings);
+            //var emailService = new EmailService(settings);
         }
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

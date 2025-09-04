@@ -5,9 +5,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <UserSecretsId>c98eca1f-a9c6-4433-bafe-50a46f81525f</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Navigation\" />
     <Folder Include="Resources\" />
   </ItemGroup>
 

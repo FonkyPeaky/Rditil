@@ -1,27 +1,35 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace Rditil
+namespace Rditil.Common
 {
-    public class RelayCommand : ICommand
+    public sealed class RelayCommand : ICommand
     {
-        private readonly Action _execute;
-        private readonly Func<bool> _canExecute;
+        private readonly Func<object?, bool> _canExecute;
+        private readonly Func<object?, Task> _executeAsync;
 
-        public RelayCommand(Action execute, Func<bool> canExecute = null)
+        // CTOR pour async
+        public RelayCommand(Func<object?, Task> executeAsync, Func<object?, bool>? canExecute = null)
         {
-            _execute = execute;
-            _canExecute = canExecute;
+            _executeAsync = executeAsync ?? throw new ArgumentNullException(nameof(executeAsync));
+            _canExecute = canExecute ?? (_ => true);
         }
 
-        public bool CanExecute(object parameter) => _canExecute == null || _canExecute();
+        // CTOR pour sync
+        public RelayCommand(Action<object?> execute, Func<object?, bool>? canExecute = null)
+            : this(p =>
+            {
+                execute?.Invoke(p);
+                return Task.CompletedTask;
+            }, canExecute)
+        { }
 
-        public void Execute(object parameter) => _execute();
+        public bool CanExecute(object? parameter) => _canExecute(parameter);
+        public event EventHandler? CanExecuteChanged;
 
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
+        public async void Execute(object? parameter) => await _executeAsync(parameter);
+
+        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 }

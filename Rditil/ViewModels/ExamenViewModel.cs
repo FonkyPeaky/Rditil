@@ -1,127 +1,84 @@
-using CommunityToolkit.Mvvm.Input;
-using Rditil.Models;
-using Rditil.Services;
-using Rditil.Views;
-using Rditil.ViewModels;
-using Rditil.Data;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
+using Rditil.Services;
 
 namespace Rditil.ViewModels
 {
-    public class ExamenViewModel : ViewModelBase
+    public class ExamenViewModel
     {
-        public static object CurrentUser;
-        private readonly EmailService? _emailService;
-        private readonly string? _userEmail;
-        private readonly List<Question>? _questions;
-        private int _currentQuestionIndex;
-        private Question? _currentQuestion;
+        private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
+        private readonly INavigationService _navigationService;
+
+        public int CurrentUserId { get; }
         private int _score;
-        private List<Question>? QuestionsTirees;
+        private int _total;
 
+        public ICommand FinishExamCommand { get; }
 
-        public Question? QuestionActuelle
+        public ExamenViewModel(
+            IUserService userService,
+            IEmailService emailService,
+            INavigationService navigationService,
+            int currentUserId /* injecte ou set selon ta logique */)
         {
-            get => _currentQuestion;
-            set
-            {
-                _currentQuestion = value;
-                OnPropertyChanged(nameof(QuestionActuelle));
-            }
+            _userService = userService;
+            _emailService = emailService;
+            _navigationService = navigationService;
+            CurrentUserId = currentUserId;
+
+            FinishExamCommand = new RelayCommand(async _ => await FinishExamAsync(), _ => true);
         }
 
-        public int NumeroQuestionActuelle => _currentQuestionIndex + 1;
-
-        public ICommand? QuestionSuivanteCommand { get; }
-
-        private void LoadCurrentQuestion()
+        // Appelle ceci quand l’examen est terminé
+        private async Task FinishExamAsync()
         {
-            if (_questions is not null)
+            // calcule _score et _total selon ta logique
+            var utilisateur = await _userService.GetByIdAsync(CurrentUserId);
+            if (utilisateur is null)
             {
-                QuestionActuelle = _questions[_currentQuestionIndex];
-                OnPropertyChanged(nameof(NumeroQuestionActuelle));
+                // TODO: notifier l’UI
+                return;
             }
-        }
 
-        private bool CanExecuteQuestionSuivante(object? parameter)
-        {
-            return _currentQuestionIndex < _questions.Count;
-        }
+            var to = !string.IsNullOrWhiteSpace(utilisateur.EmailNPlus1)
+                ? utilisateur.EmailNPlus1!
+                : "admin@exemple.local"; // fallback
 
-        private async Task ExecuteQuestionSuivante(object? parameter)
-        {
-            try
-            {
-                _currentQuestionIndex++;
-
-                if (_currentQuestionIndex < _questions.Count)
-                {
-                    LoadCurrentQuestion();
-                }
-                else
-                {
-                    await FinirExamenAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erreur lors de la validation de la réponse : {ex.Message}");
-            }
-        }
-
-        private async Task FinirExamenAsync()
-        {
-            var dbContext = (App.AppHost?.Services.GetService(typeof(AppDbContext)) as AppDbContext)
-                ?? throw new InvalidOperationException("DbContext is not available.");
-
-            var examResultService = new DbExamResultService(dbContext);
-            examResultService.EnregistrerExamen(App.CurrentUser, _score, QuestionsTirees.ToList());
-
-            // Envoyer email résultat
             try
             {
                 await _emailService.SendExamResultAsync(
-                      _userEmail,
-                      _userEmail,
-                      _score,
-                      _questions.Count
+                    to: to,
+                    cc: utilisateur.Email,
+                    score: _score,
+                    total: _total
                 );
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show(
-                    "Erreur lors de l'envoi de l'email.",
-                    "Erreur",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error
-                );
+                // TODO: notifier l’UI (ex.Message) via un Dialog/Toast service
             }
 
-            // Naviguer vers EndPage
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                var mainWindow = Application.Current.Windows
-                    .OfType<Window>()
-                    .FirstOrDefault(w => w.Title == "MainWindow");
-
-                if (mainWindow != null)
-                {
-                    var frame = (System.Windows.Controls.Frame)mainWindow.FindName("MainFrame");
-                    frame?.Navigate(new EndPage(
-                        new ResultViewModel(
-                            _emailService,
-                            _userEmail,
-                            _score,
-                            _questions.Count
-                        )
-                    ));
-                }
-            });
+            _navigationService.NavigateTo<ResultViewModel>();
         }
+    }
+
+    // RelayCommand simple (si tu n’en as pas)
+    public sealed class RelayCommand : ICommand
+    {
+        private readonly Func<object?, bool> _canExecute;
+        private readonly Func<object?, Task> _executeAsync;
+
+        public RelayCommand(Func<object?, Task> executeAsync, Func<object?, bool>? canExecute = null)
+        {
+            _executeAsync = executeAsync;
+            _canExecute = canExecute ?? (_ => true);
+        }
+
+        public bool CanExecute(object? parameter) => _canExecute(parameter);
+        public event EventHandler? CanExecuteChanged;
+        public async void Execute(object? parameter) => await _executeAsync(parameter);
+        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 }

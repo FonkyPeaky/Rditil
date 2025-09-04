@@ -21,7 +21,7 @@ namespace Rditil.Services
             {
                 DateExamen = DateTime.Now,
                 DureeExamen = TimeSpan.FromMinutes(60),
-                SCORE = score,
+                Score = score,
                 Id_Utilisateur = utilisateur.Id_Utilisateur,
                 ExamenQuestions = new List<Examen_Question>()
             };

@@ -1,40 +1,23 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Rditil.Models;
+﻿using System.Windows;
 using Rditil.Services;
 using Rditil.ViewModels;
-using Rditil.Views;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Rditil
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    ///
-
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        private readonly INavigationService _navigation;
+
+        public MainWindow(INavigationService navigation)
         {
             InitializeComponent();
+            _navigation = navigation;
+        }
 
-            var navigationService = App.AppHost.Services.GetRequiredService<INavigationService>();
-            navigationService.SetFrame(MainFrame);
-            navigationService.NavigateTo<LoginViewModel>();
-            //navigationService.NavigateTo<AdminPanel>();
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            _navigation.SetFrame(MainFrame);
+            _navigation.NavigateTo<LoginViewModel>(null);
         }
     }
 }
