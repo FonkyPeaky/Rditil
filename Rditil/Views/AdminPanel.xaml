@@ -148,7 +148,6 @@
                 <Button Content="Ajouter l’utilisateur"
                         Style="{StaticResource PrimaryButton}"
                         Command="{Binding AjouterCommand}"
-                        Click="AddUserButton_Click"
                         Margin="0,10,0,0"/>
             </StackPanel>
         </Border>

@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using CommunityToolkit.Mvvm.Input;                 // <- Toolkit
+using CommunityToolkit.Mvvm.Input;
 using Rditil.Services;
 
 namespace Rditil.ViewModels
@@ -35,7 +35,6 @@ namespace Rditil.ViewModels
             set { _errorMessage = value; OnPropertyChanged(); }
         }
 
-        // Commands (types Toolkit)
         public IAsyncRelayCommand LoginCommand { get; }
         public IRelayCommand CreateAccountCommand { get; }
 
@@ -49,7 +48,7 @@ namespace Rditil.ViewModels
 
             // ✅ commande sync
             CreateAccountCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(NavigateToAdmin);
-        }
+        }                          
 
         private async Task LoginAsync()
         {

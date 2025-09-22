@@ -8,12 +8,15 @@ using Rditil.Services;
 using Rditil.ViewModels;
 using Rditil.Views;
 using System.Windows;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Rditil
 {
     public partial class App : Application
     {
         public static IHost AppHost { get; private set; } = null!;
+        public IServiceProvider Services => AppHost.Services;   // raccourci pratique
+
 
         // ✅ utilisateur courant accessible globalement
         public static Utilisateur? CurrentUser { get; set; }
@@ -47,7 +50,7 @@ namespace Rditil
                     services.AddTransient<LoginViewModel>();
                     services.AddTransient<WelcomeViewModel>();
                     services.AddTransient<AdminPanelViewModel>();
-                    services.AddTransient<ExamenViewModel>();
+                    services.AddTransient<ExamViewModel>();
                     services.AddTransient<QuestionViewModel>();
                     services.AddTransient<ResultViewModel>();
 
@@ -63,10 +66,17 @@ namespace Rditil
                     services.AddSingleton<MainWindow>();
                 })
                 .Build();
+
+
         }
+
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            var cfg = AppHost.Services.GetRequiredService<IConfiguration>();
+            var cs = cfg.GetConnectionString("DefaultConnection") ?? "(null)";
+            System.Diagnostics.Debug.WriteLine("CS USED: " + cs.Replace("Password=", "Password=***"));
+
             AppHost.Start();
 
             var mainWindow = AppHost.Services.GetRequiredService<MainWindow>();
@@ -74,6 +84,15 @@ namespace Rditil
             mainWindow.Show();
 
             base.OnStartup(e);
+
+            using (var scope = AppHost.Services.CreateScope())
+            {
+                var ctx = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                ctx.Database.EnsureCreated(); // ou ctx.Database.Migrate();
+                DbSeeder.Seed(ctx);
+            }
+
+
         }
 
         protected override async void OnExit(ExitEventArgs e)

@@ -12,8 +12,8 @@ using Rditil.Data;
 namespace Rditil.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250806113517_InitSchema")]
-    partial class InitSchema
+    [Migration("20250915150035_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,7 +42,7 @@ namespace Rditil.Migrations
                     b.Property<int>("Id_Utilisateur")
                         .HasColumnType("integer");
 
-                    b.Property<int>("SCORE")
+                    b.Property<int>("Score")
                         .HasColumnType("integer");
 
                     b.Property<int>("UtilisateurId_Utilisateur")
@@ -63,12 +63,7 @@ namespace Rditil.Migrations
                     b.Property<int>("Id_Question")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ExamenId_Examen")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id_Examen", "Id_Question");
-
-                    b.HasIndex("ExamenId_Examen");
 
                     b.HasIndex("Id_Question");
 
@@ -113,6 +108,8 @@ namespace Rditil.Migrations
 
                     b.HasKey("Id_Reponse");
 
+                    b.HasIndex("Id_Question");
+
                     b.HasIndex("QuestionId_Question");
 
                     b.ToTable("Reponses");
@@ -122,38 +119,38 @@ namespace Rditil.Migrations
                 {
                     b.Property<int>("Id_Utilisateur")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("Id_Utilisateur");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id_Utilisateur"));
 
                     b.Property<DateTime>("DernierExamen")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("DernierExamen");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("Email");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("EmailNPlus1")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("Nom")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("Nom");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("Password");
+                        .HasColumnType("text");
 
                     b.Property<string>("Prenom")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("Prenom");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("Score")
-                        .HasColumnType("integer")
-                        .HasColumnName("Score");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id_Utilisateur");
 
@@ -173,10 +170,6 @@ namespace Rditil.Migrations
 
             modelBuilder.Entity("Rditil.Models.Examen_Question", b =>
                 {
-                    b.HasOne("Rditil.Models.Examen", null)
-                        .WithMany("Examen_Questions")
-                        .HasForeignKey("ExamenId_Examen");
-
                     b.HasOne("Rditil.Models.Examen", "Examen")
                         .WithMany("ExamenQuestions")
                         .HasForeignKey("Id_Examen")
@@ -197,6 +190,12 @@ namespace Rditil.Migrations
             modelBuilder.Entity("Rditil.Models.Reponse", b =>
                 {
                     b.HasOne("Rditil.Models.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("Id_Question")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Rditil.Models.Question", null)
                         .WithMany("Reponses")
                         .HasForeignKey("QuestionId_Question");
 
@@ -206,8 +205,6 @@ namespace Rditil.Migrations
             modelBuilder.Entity("Rditil.Models.Examen", b =>
                 {
                     b.Navigation("ExamenQuestions");
-
-                    b.Navigation("Examen_Questions");
                 });
 
             modelBuilder.Entity("Rditil.Models.Question", b =>

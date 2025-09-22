@@ -12,7 +12,7 @@ namespace Rditil.Services
         {
             _context = context;
         }
-
+    
         public Utilisateur GetUserByEmailAndPassword(string email, string password)
         {
             return _context.Utilisateurs.FirstOrDefault(u => u.Email == email && u.PasswordHash == password);

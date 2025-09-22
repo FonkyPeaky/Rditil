@@ -1,28 +1,14 @@
-﻿using System.Windows;
+﻿using System.Windows.Controls;
 using Rditil.ViewModels;
 
 namespace Rditil.Views
 {
-    /// <summary>
-    /// Interaction logic for EndPage.xaml
-    /// </summary>
-    public partial class EndPage : Window
+    public partial class EndPage : Page
     {
-        public EndPage(ResultViewModel viewModel)
+        public EndPage(ResultViewModel vm)
         {
             InitializeComponent();
-            DataContext = viewModel;
+            DataContext = vm;
         }
-        private void Quitter_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
-        }
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (Resources["EnterStoryboard"] is System.Windows.Media.Animation.Storyboard sb)
-                sb.Begin();
-        }
-
-
     }
 }

@@ -1,19 +1,14 @@
-﻿using System.Security.Cryptography;
-using System.Text;
+using BCrypt.Net;
 
 public static class PasswordHelper
 {
     public static string HashPassword(string password)
     {
-        using var sha256 = SHA256.Create();
-        byte[] inputBytes = Encoding.UTF8.GetBytes(password);
-        byte[] hashBytes = sha256.ComputeHash(inputBytes);
-        return Convert.ToBase64String(hashBytes);
+        return BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12);
     }
 
     public static bool VerifyPassword(string enteredPassword, string hashedPassword)
     {
-        var enteredHash = HashPassword(enteredPassword);
-        return enteredHash == hashedPassword;
+        return BCrypt.Net.BCrypt.Verify(enteredPassword, hashedPassword);
     }
 }

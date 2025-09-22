@@ -1,56 +1,27 @@
-﻿using System.Threading.Tasks;
-using System.Windows.Input;
-using Rditil.Common; // <-- RelayCommand
-using Rditil.Services;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 
 namespace Rditil.ViewModels
 {
-    public class ResultViewModel
+    public partial class ResultViewModel : ObservableObject
     {
-        private readonly IEmailService _emailService;
+        [ObservableProperty] private int score;
+        [ObservableProperty] private int total;
+        [ObservableProperty] private TimeSpan timeUsed;
+        [ObservableProperty] private bool timeExpired;
 
-        public string EmailUtilisateur { get; }
-        public int Score { get; }
-        public int TotalQuestions { get; }
+        public string ScoreText => $"{Score}/{Total}";
+        public string TimeUsedText => string.Format("{0:00}:{1:00}:{2:00}",
+            (int)TimeUsed.TotalHours, TimeUsed.Minutes, TimeUsed.Seconds);
 
-        public ICommand EnvoyerResultatParEmailCommand { get; }
-        public ICommand QuitterCommand { get; }
+        public string Title => TimeExpired ? "Temps imparti !" : "Examen terminé";
+        public string Subtitle => TimeExpired
+            ? "Le temps est écoulé. Votre score ci-dessous a été comptabilisé."
+            : "Félicitations ! Voici votre score et votre temps.";
 
-        public ResultViewModel(IEmailService emailService,
-                               string emailUtilisateur,
-                               int score,
-                               int totalQuestions)
+        public ResultViewModel(int score, int total, TimeSpan used, bool expired)
         {
-            _emailService = emailService;
-            EmailUtilisateur = emailUtilisateur;
-            Score = score;
-            TotalQuestions = totalQuestions;
-
-            // Async
-            EnvoyerResultatParEmailCommand = new RelayCommand(async _ => await EnvoyerResultatParEmailAsync());
-
-            // Sync (fermer l’appli, etc.)
-            QuitterCommand = new RelayCommand(_ =>
-            {
-                QuitterApplication();
-                return Task.CompletedTask;
-            });
-        }
-
-        private async Task EnvoyerResultatParEmailAsync()
-        {
-            // adapte: to = Email du N+1 / cc = candidat
-            await _emailService.SendExamResultAsync(
-                to: "manager@exemple.local",
-                cc: EmailUtilisateur,
-                score: Score,
-                total: TotalQuestions
-            );
-        }
-
-        private void QuitterApplication()
-        {
-            System.Windows.Application.Current.Shutdown();
+            Score = score; Total = total; TimeUsed = used; TimeExpired = expired;
         }
     }
 }

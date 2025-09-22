@@ -16,7 +16,7 @@ namespace Rditil.Data
         {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
             // Configuration de la connexion à la base de données Postgre a remplacer par la nouvelle de randtad 
-            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Test;Username=postgres;Password=Chacal");
+            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Test;Username=postgres;Password=chacal");
             return new AppDbContext(optionsBuilder.Options); 
         }
     }

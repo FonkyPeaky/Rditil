@@ -105,6 +105,8 @@ namespace Rditil.Migrations
 
                     b.HasKey("Id_Reponse");
 
+                    b.HasIndex("Id_Question");
+
                     b.HasIndex("QuestionId_Question");
 
                     b.ToTable("Reponses");
@@ -185,6 +187,12 @@ namespace Rditil.Migrations
             modelBuilder.Entity("Rditil.Models.Reponse", b =>
                 {
                     b.HasOne("Rditil.Models.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("Id_Question")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Rditil.Models.Question", null)
                         .WithMany("Reponses")
                         .HasForeignKey("QuestionId_Question");
 

@@ -1,38 +1,38 @@
-using Rditil.Models;
+﻿using System.Windows;
+using System.Windows.Media.Animation;
+using Microsoft.Extensions.DependencyInjection;
+using Rditil.Data;
 using Rditil.Services;
 using Rditil.ViewModels;
-using System.Windows;
-using System.Windows.Input;
 
 namespace Rditil.Views
 {
-    public partial class ExamenView : Window
+    public partial class ExamenView
     {
-        public ExamenView(string userEmail)
+        public ExamenView(string userEmail, string managerEmail, string userFullName = null)
         {
             InitializeComponent();
 
-            //var settings = new SmtpSettings
-            //{
-            //    Server = "smtp.example.com",
-            //    Port = 587,
-            //    Username = "your_username",
-            //    Password = "your_password",
-            //    FromEmail = "noreply@example.com",
-            //    EnableSsl = true
-            //};
+            var sp = ((App)Application.Current).Services; // exposé par ton AppHost
+            var ctx = sp.GetRequiredService<AppDbContext>();
+            var mail = sp.GetRequiredService<IEmailService>();
 
-            //var emailService = new EmailService(settings);
-        }
+            var vm = new ExamViewModel(ctx, mail, userEmail, managerEmail)
+            {
+                UserFullName = userFullName
+            };
 
-        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            DragMove();
-        }
+            // Navigation vers EndPage quand terminé
+            vm.ExamFinished += (s, e) =>
+            {
+                NavigationService?.Navigate(new EndPage(new ResultViewModel(
+                    e.Score, e.Total, e.TimeUsed, e.TimeExpired)));
+            };
 
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
+            DataContext = vm;
+
+            // Démarrer tout de suite l’épreuve (1h + 40 QCM)
+            vm.Demarrer();
         }
     }
 }

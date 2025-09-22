@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Rditil.Migrations
 {
     /// <inheritdoc />
-    public partial class AddTestTable : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,10 +31,13 @@ namespace Rditil.Migrations
                 {
                     Id_Utilisateur = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Nom = table.Column<string>(type: "text", nullable: false),
-                    Prenom = table.Column<string>(type: "text", nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false),
-                    Password = table.Column<string>(type: "text", nullable: false)
+                    Nom = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Prenom = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: false),
+                    EmailNPlus1 = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Score = table.Column<int>(type: "integer", nullable: false),
+                    DernierExamen = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -56,6 +59,12 @@ namespace Rditil.Migrations
                 {
                     table.PrimaryKey("PK_Reponses", x => x.Id_Reponse);
                     table.ForeignKey(
+                        name: "FK_Reponses_Questions_Id_Question",
+                        column: x => x.Id_Question,
+                        principalTable: "Questions",
+                        principalColumn: "Id_Question",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Reponses_Questions_QuestionId_Question",
                         column: x => x.QuestionId_Question,
                         principalTable: "Questions",
@@ -70,7 +79,7 @@ namespace Rditil.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     DateExamen = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DureeExamen = table.Column<TimeSpan>(type: "interval", nullable: false),
-                    SCORE = table.Column<int>(type: "integer", nullable: false),
+                    Score = table.Column<int>(type: "integer", nullable: false),
                     Id_Utilisateur = table.Column<int>(type: "integer", nullable: false),
                     UtilisateurId_Utilisateur = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -90,17 +99,11 @@ namespace Rditil.Migrations
                 columns: table => new
                 {
                     Id_Examen = table.Column<int>(type: "integer", nullable: false),
-                    Id_Question = table.Column<int>(type: "integer", nullable: false),
-                    ExamenId_Examen = table.Column<int>(type: "integer", nullable: true)
+                    Id_Question = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ExamenQuestions", x => new { x.Id_Examen, x.Id_Question });
-                    table.ForeignKey(
-                        name: "FK_ExamenQuestions_Examens_ExamenId_Examen",
-                        column: x => x.ExamenId_Examen,
-                        principalTable: "Examens",
-                        principalColumn: "Id_Examen");
                     table.ForeignKey(
                         name: "FK_ExamenQuestions_Examens_Id_Examen",
                         column: x => x.Id_Examen,
@@ -116,11 +119,6 @@ namespace Rditil.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExamenQuestions_ExamenId_Examen",
-                table: "ExamenQuestions",
-                column: "ExamenId_Examen");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ExamenQuestions_Id_Question",
                 table: "ExamenQuestions",
                 column: "Id_Question");
@@ -129,6 +127,11 @@ namespace Rditil.Migrations
                 name: "IX_Examens_UtilisateurId_Utilisateur",
                 table: "Examens",
                 column: "UtilisateurId_Utilisateur");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reponses_Id_Question",
+                table: "Reponses",
+                column: "Id_Question");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reponses_QuestionId_Question",

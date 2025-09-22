@@ -1,28 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Media.Animation;
 
 namespace Rditil.Views
 {
-    /// <summary>
-    /// Interaction logic for WelcomePage.xaml
-    /// </summary>
     public partial class WelcomePage : Page
     {
         public WelcomePage()
         {
             InitializeComponent();
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (Resources["EnterStoryboard"] is Storyboard sb)
+                sb.Begin();
+        }
+
+        private void StartButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Récup des infos depuis le VM si dispo
+            string userEmail = null;
+            string managerEmail = null;
+            string userFullName = null;
+
+            dynamic vm = DataContext; // permissif pour tes différents VM
+            try
+            {
+                userEmail = vm?.Utilisateur?.Email ?? vm?.Email;
+                managerEmail = vm?.Utilisateur?.ManagerEmail ?? vm?.ManagerEmail;
+                userFullName = vm?.NomUtilisateur ??
+                               ((vm?.Utilisateur?.Prenom + " " + vm?.Utilisateur?.Nom)?.Trim());
+            }
+            catch { }
+
+            userEmail ??= "test@example.com";
+            userFullName ??= "candidat";
+
+            // Vers la page QCM
+            NavigationService?.Navigate(new ExamenView(userEmail, managerEmail, userFullName));
         }
     }
 }

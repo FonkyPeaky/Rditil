@@ -1,9 +1,12 @@
-﻿using System.Windows;
+﻿using Rditil.Data;
 using Rditil.Services;
 using Rditil.ViewModels;
+using System.Windows;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Rditil
 {
+
     public partial class MainWindow : Window
     {
         private readonly INavigationService _navigation;
@@ -19,5 +22,6 @@ namespace Rditil
             _navigation.SetFrame(MainFrame);
             _navigation.NavigateTo<LoginViewModel>(null);
         }
+
     }
 }

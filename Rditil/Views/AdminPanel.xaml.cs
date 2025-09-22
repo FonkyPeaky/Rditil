@@ -25,13 +25,5 @@ namespace Rditil.Views
                 vm.MotDePasse = pb.Password;
             }
         }
-
-        private void AddUserButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (DataContext is AdminPanelViewModel vm && PasswordBox != null)
-            {
-                vm.MotDePasse = PasswordBox.Password;
-            }
-        }
     }
 }

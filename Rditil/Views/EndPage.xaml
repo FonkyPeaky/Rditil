@@ -1,136 +1,66 @@
-﻿<Window x:Class="Rditil.Views.EndPage"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Rditil – Résultats"
-        WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize"
-        Width="720" Height="460"
-        Loaded="Window_Loaded">
+﻿<Page x:Class="Rditil.Views.EndPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Résultat">
 
-    <Window.Resources>
-        <!-- Dégradé clair (même palette que l’AdminPanel) -->
-        <LinearGradientBrush x:Key="GradientBg" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#F0F8FF" Offset="0"/>
-            <GradientStop Color="#D6E9FF" Offset="1"/>
+    <Page.Resources>
+        <LinearGradientBrush x:Key="AppGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#0B1434" Offset="0"/>
+            <GradientStop Color="#1B2A80" Offset="0.45"/>
+            <GradientStop Color="#5B1FE2" Offset="1"/>
         </LinearGradientBrush>
-
-        <DropShadowEffect x:Key="SoftShadow" Color="#000000"
-                          BlurRadius="18" ShadowDepth="0" Opacity="0.25"/>
-
-        <!-- Bouton primaire bleu -->
-        <Style TargetType="Button" x:Key="PrimaryButton">
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Foreground" Value="White"/>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Padding" Value="28"/>
+            <Setter Property="Background" >
+                <Setter.Value>
+                    <SolidColorBrush Color="#1AFFFFFF"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Opacity="0.35" BlurRadius="24" ShadowDepth="2"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="H1" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="10,6"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border CornerRadius="10" Background="#3A8DFF" Padding="12,8">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#1E70E8"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="FontSize" Value="34"/>
+            <Setter Property="Foreground" Value="White"/>
         </Style>
-
-        <!-- Bouton secondaire blanc bordé -->
-        <Style TargetType="Button" x:Key="SecondaryButton" BasedOn="{StaticResource PrimaryButton}">
-            <Setter Property="Foreground" Value="#1E70E8"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border CornerRadius="10" Background="White" Padding="12,8"
-                                BorderBrush="#1E70E8" BorderThickness="1.2">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+        <Style x:Key="Body" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#F0F3FF"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
+    </Page.Resources>
 
-        <!-- Animation d’entrée -->
-        <Storyboard x:Key="EnterStoryboard">
-            <DoubleAnimation Storyboard.TargetName="Card"
-                             Storyboard.TargetProperty="Opacity"
-                             From="0" To="1" Duration="0:0:0.4"/>
-            <DoubleAnimation Storyboard.TargetName="CardTranslate"
-                             Storyboard.TargetProperty="Y"
-                             From="15" To="0" Duration="0:0:0.4"/>
-        </Storyboard>
-    </Window.Resources>
+    <Page.Background>
+        <StaticResource ResourceKey="AppGradient"/>
+    </Page.Background>
 
-    <!-- ⬇️ on met le gradient sur le Grid, pas sur la Window -->
-    <Grid Background="{StaticResource GradientBg}">
-        <!-- Carte centrale -->
-        <Border x:Name="Card"
-                Width="560"
-                Padding="28"
-                CornerRadius="16"
-                Background="White"
-                Effect="{StaticResource SoftShadow}"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Opacity="0"
-                RenderTransformOrigin="0.5,0.5">
-            <Border.RenderTransform>
-                <TranslateTransform x:Name="CardTranslate" Y="15"/>
-            </Border.RenderTransform>
-
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <!-- Header -->
-                <StackPanel Grid.Row="0" Margin="0,0,0,12">
-                    <TextBlock Text="🎉 Bravo !" FontSize="24" FontWeight="Bold" Foreground="#003366"/>
-                    <TextBlock Text="Voici le récapitulatif de votre session."
-                               Foreground="#5A6B84" Margin="0,4,0,0"/>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Border Grid.Column="1" Style="{StaticResource Card}" Width="700" Margin="0,120,0,120">
+            <StackPanel>
+                <TextBlock Text="{Binding Title}" Style="{StaticResource H1}" Margin="0,0,0,6"/>
+                <TextBlock Text="{Binding Subtitle}" Style="{StaticResource Body}" Margin="0,0,0,18"/>
+                <Separator/>
+                <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                    <TextBlock Text="Score : " Style="{StaticResource Body}" Margin="0,0,6,0"/>
+                    <TextBlock Text="{Binding ScoreText}" FontSize="20" FontWeight="Bold" Foreground="White"/>
                 </StackPanel>
-
-                <!-- Contenu : à binder à ton VM -->
-                <Grid Grid.Row="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <StackPanel Orientation="Horizontal" Margin="0,4,0,8">
-                        <TextBlock Text="Nom :" Width="140" Foreground="#6A7A90"/>
-                        <TextBlock Text="{Binding Utilisateur.Nom}" FontWeight="SemiBold" Foreground="#003366"/>
-                        <TextBlock Text=" " />
-                        <TextBlock Text="{Binding Utilisateur.Prenom}" FontWeight="SemiBold" Foreground="#003366"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,4,0,8">
-                        <TextBlock Text="Score :" Width="140" Foreground="#6A7A90"/>
-                        <TextBlock Text="{Binding Score}" FontWeight="SemiBold" Foreground="#003366"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="0,4,0,8">
-                        <TextBlock Text="Dernier examen :" Width="140" Foreground="#6A7A90"/>
-                        <TextBlock Text="{Binding DernierExamen, StringFormat={}{0:dd/MM/yyyy HH:mm}}"
-                                   FontWeight="SemiBold" Foreground="#003366"/>
-                    </StackPanel>
-                </Grid>
-
-                <!-- Actions (sans Spacing en WPF) -->
-                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
-                    <Button Content="Fermer" Style="{StaticResource SecondaryButton}"
-                            Click="Quitter_Click" Margin="0,0,10,0"/>
-                    <Button Content="Refaire un test" Style="{StaticResource PrimaryButton}"
-                            Command="{Binding RestartCommand}"/>
+                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                    <TextBlock Text="Temps utilisé : " Style="{StaticResource Body}" Margin="0,0,6,0"/>
+                    <TextBlock Text="{Binding TimeUsedText}" FontSize="16" Foreground="White"/>
                 </StackPanel>
-            </Grid>
+            </StackPanel>
         </Border>
     </Grid>
-</Window>
+</Page>

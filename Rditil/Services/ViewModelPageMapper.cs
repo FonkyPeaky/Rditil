@@ -12,7 +12,7 @@ namespace Rditil.Navigation
             { typeof(LoginViewModel), typeof(LoginPage) },
             { typeof(WelcomeViewModel), typeof(WelcomePage) },
             { typeof(AdminPanelViewModel), typeof(AdminPanel) },
-            { typeof(ExamenViewModel), typeof(ExamenView) },
+            { typeof(ExamViewModel), typeof(ExamenView) },
             { typeof(QuestionViewModel), typeof(QuestionPage) },
             { typeof(ResultViewModel), typeof(EndPage) },
         };

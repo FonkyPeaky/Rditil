@@ -1,13 +1,11 @@
-﻿using BCrypt.Net;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
 using Rditil.Data;
 using Rditil.Models;
 using Rditil.Services;
 using System;
-using System.Diagnostics;
-using System.Windows.Input;
-
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace Rditil.ViewModels
 {
@@ -17,60 +15,54 @@ namespace Rditil.ViewModels
 
         public Utilisateur NouvelUtilisateur { get; set; } = new();
 
-        public string MotDePasse { get; set; } = "";
+        private string _motDePasse = "";
+        public string MotDePasse
+        {
+            get => _motDePasse;
+            set { _motDePasse = value; OnPropertyChanged(nameof(MotDePasse)); }
+        }
 
-        public ICommand AjouterCommand { get; }
-
-        public Utilisateur NewUser { get; set; } = new Utilisateur();
-        public ICommand AddUserCommand { get; }
-
+        public IAsyncRelayCommand AjouterCommand { get; }
 
         public AdminPanelViewModel(AppDbContext dbContext)
         {
-            
             _dbContext = dbContext;
-            //AjouterCommand = new RelayCommand(ExecuteAjouter);
-            //AddUserCommand = new RelayCommand(AddUser);
-
+            AjouterCommand = new AsyncRelayCommand(AjouterAsync);
         }
 
-        // ExecuteAjouter est appelé lorsque l'utilisateur clique sur le bouton "Ajouter"
-        private async void ExecuteAjouter()
+        private async Task AjouterAsync()
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(NouvelUtilisateur.Email) || string.IsNullOrWhiteSpace(MotDePasse))
+                var email = (NouvelUtilisateur.Email ?? "").Trim().ToLower();
+
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(MotDePasse))
                 {
-                    Console.WriteLine("⚠️ Champs requis manquants.");
+                    MessageBox.Show("Email et mot de passe sont requis.", "Validation", MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
                 }
 
-                var email = NouvelUtilisateur.Email.Trim().ToLower();
-
-                var utilisateurExistant = await _dbContext.Utilisateurs
+                var existe = await _dbContext.Utilisateurs
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(u => u.Email.ToLower() == email);
+                    .AnyAsync(u => u.Email.ToLower() == email);
 
-                if (utilisateurExistant != null)
+                if (existe)
                 {
-                    Console.WriteLine("❌ Un utilisateur avec cet email existe déjà.");
+                    MessageBox.Show("Un utilisateur avec cet email existe déjà.", "Doublon", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                // Hash du mot de passe
+                NouvelUtilisateur.Email = email;
                 NouvelUtilisateur.PasswordHash = PasswordHelper.HashPassword(MotDePasse);
-
-                // ✅ Valeurs par défaut nécessaires
                 NouvelUtilisateur.Score = 0;
                 NouvelUtilisateur.DernierExamen = DateTime.UtcNow;
 
-                // Ajout à la base
                 _dbContext.Utilisateurs.Add(NouvelUtilisateur);
                 await _dbContext.SaveChangesAsync();
 
-                Console.WriteLine("✅ Utilisateur ajouté avec succès.");
+                MessageBox.Show("Utilisateur ajouté avec succès ✅", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                // Reset des champs
+                // reset du formulaire
                 NouvelUtilisateur = new Utilisateur();
                 MotDePasse = "";
                 OnPropertyChanged(nameof(NouvelUtilisateur));
@@ -78,33 +70,8 @@ namespace Rditil.ViewModels
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"⚠️ Erreur lors de l'ajout : {ex.Message}");
+                MessageBox.Show($"Erreur lors de l'ajout : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-        private void AddUser()
-        {
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(NewUser.PasswordHash))
-                {
-                    NewUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(NewUser.PasswordHash);
-                    NewUser.DernierExamen = DateTime.UtcNow;
-                    NewUser.Score = 0;
-
-                    _dbContext.Utilisateurs.Add(NewUser);
-                    _dbContext.SaveChanges();
-
-                    Debug.WriteLine($"✅ Utilisateur ajouté : {NewUser.Email}");
-                    NewUser = new Utilisateur(); // Reset form
-                    OnPropertyChanged(nameof(NewUser));
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"❌ Erreur d'ajout utilisateur : {ex.Message}");
-            }
-        }
-
-
     }
 }
