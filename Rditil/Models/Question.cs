@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Rditil.Models
+﻿namespace Rditil.Models
 {
     public class Question
     {
@@ -14,6 +7,4 @@ namespace Rditil.Models
 
         public ICollection<Reponse> Reponses { get; set; } = new List<Reponse>();
     }
-
-
 }

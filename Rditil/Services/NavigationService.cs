@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Rditil.Navigation; // pour ViewModelPageMapper
 using System.Reflection;
 using System.Windows.Controls;
-using Microsoft.Extensions.DependencyInjection;
-using Rditil.Navigation; // pour ViewModelPageMapper
 
 namespace Rditil.Services
 {

@@ -1,9 +1,8 @@
-﻿using System.Windows;
-using System.Windows.Media.Animation;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Rditil.Data;
 using Rditil.Services;
 using Rditil.ViewModels;
+using System.Windows;
 
 namespace Rditil.Views
 {

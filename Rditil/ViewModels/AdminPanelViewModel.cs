@@ -2,9 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Rditil.Data;
 using Rditil.Models;
-using Rditil.Services;
-using System;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Rditil.ViewModels

@@ -4,10 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Rditil.Data;
 using Rditil.Models;
 using Rditil.Services;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows.Threading;
 
 namespace Rditil.ViewModels
@@ -43,6 +40,20 @@ namespace Rditil.ViewModels
 
         public event EventHandler<ExamFinishedEventArgs> ExamFinished;
 
+
+        // 🌟 AJOUT : Progression → utilisée par la ProgressBar
+        public double Progression
+        {
+            get
+            {
+                if (_questions == null || _questions.Count == 0)
+                    return 0;
+
+                return (_index / (double)_questions.Count) * 100.0;
+            }
+        }
+
+
         public IAsyncRelayCommand QuestionSuivanteCommand { get; }
         public IAsyncRelayCommand DemarrerCommand { get; }
 
@@ -59,8 +70,9 @@ namespace Rditil.ViewModels
             _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _timer.Tick += (_, __) =>
             {
-                _remaining = _remaining - TimeSpan.FromSeconds(1);
+                _remaining -= TimeSpan.FromSeconds(1);
                 TempsRestantText = _remaining.ToString(@"hh\:mm\:ss");
+
                 if (_remaining <= TimeSpan.Zero)
                 {
                     _timer.Stop();
@@ -69,17 +81,24 @@ namespace Rditil.ViewModels
             };
         }
 
+
+        // Méthode déclenchée depuis ExamenView.xaml.cs
         public async void Demarrer() => await DemarrerAsync();
 
-        private async System.Threading.Tasks.Task DemarrerAsync()
+
+        private async Task DemarrerAsync()
         {
             _startUtc = DateTime.UtcNow;
             _remaining = TimeSpan.FromHours(1);
             TempsRestantText = _remaining.ToString(@"hh\:mm\:ss");
+
             _score = 0;
             _index = 0;
 
-            // Tirage des 40 questions avec leurs réponses
+            // 🔥 IMPORTANT : notifier la ProgressBar
+            OnPropertyChanged(nameof(Progression));
+
+            // Charger 40 questions tirées au hasard
             var all = await _ctx.Questions
                 .Include(q => q.Reponses)
                 .ToListAsync();
@@ -90,9 +109,12 @@ namespace Rditil.ViewModels
             _timer.Start();
         }
 
+
         private void ChargerQuestion(int i)
         {
-            if (i < 0 || i >= _questions.Count) return;
+            if (i < 0 || i >= _questions.Count)
+                return;
+
             QuestionEnCours = _questions[i];
 
             var items = QuestionEnCours.Reponses
@@ -108,15 +130,22 @@ namespace Rditil.ViewModels
             ReponsesChoix = new ObservableCollection<ReponseChoix>(items);
         }
 
-        private async System.Threading.Tasks.Task ValiderEtSuivantAsync()
+
+        private async Task ValiderEtSuivantAsync()
         {
-            // Correction : l’ensemble choisi doit égaler l’ensemble correct
+            // Vérifier la bonne réponse
             var selected = ReponsesChoix.Where(x => x.IsChoisie).Select(x => x.Id).ToHashSet();
             var correct = ReponsesChoix.Where(x => x.EstCorrect).Select(x => x.Id).ToHashSet();
+
             if (selected.SetEquals(correct))
                 _score++;
 
+            // Passer à la question suivante
             _index++;
+
+            // 🔥 IMPORTANT : notifier la progression
+            OnPropertyChanged(nameof(Progression));
+
             if (_index < _questions.Count)
             {
                 ChargerQuestion(_index);
@@ -127,17 +156,22 @@ namespace Rditil.ViewModels
                 Finish(timeExpired: false);
             }
 
-            await System.Threading.Tasks.Task.CompletedTask;
+            await Task.CompletedTask;
         }
+
 
         private void Finish(bool timeExpired)
         {
             var used = DateTime.UtcNow - _startUtc;
+
             try
             {
                 _ = _emailService.SendExamResultAsync(_managerEmail, _userEmail, _score, _questions.Count);
             }
-            catch { /* ne bloque pas la fin si email KO */ }
+            catch
+            {
+                // On ne bloque pas si l'email échoue
+            }
 
             ExamFinished?.Invoke(this, new ExamFinishedEventArgs
             {

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Rditil.ViewModels;
 using Rditil.Views;
-using Rditil.ViewModels;
 
 namespace Rditil.Navigation
 {

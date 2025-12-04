@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Rditil.Services
+﻿namespace Rditil.Services
 {
     // POCO de configuration pour l'Options pattern
     public sealed class SmtpSettings

@@ -1,7 +1,7 @@
-﻿using System.Windows;
+﻿using Rditil.ViewModels;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
-using Rditil.ViewModels;
 
 namespace Rditil.Views
 {

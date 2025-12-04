@@ -1,9 +1,7 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using Rditil.Services;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Rditil.ViewModels
 {
@@ -48,7 +46,7 @@ namespace Rditil.ViewModels
 
             // ✅ commande sync
             CreateAccountCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(NavigateToAdmin);
-        }                          
+        }
 
         private async Task LoginAsync()
         {

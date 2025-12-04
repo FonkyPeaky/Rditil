@@ -2,7 +2,6 @@
 using Rditil.Data;
 using Rditil.Models;
 //using Rditil.AppDbContext; // adapte si ton DbContext est dans un autre namespace
-using System.Threading.Tasks;
 
 namespace Rditil.Services
 {

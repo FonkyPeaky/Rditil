@@ -1,5 +1,5 @@
-﻿using System.Windows.Controls;
-using Rditil.ViewModels;
+﻿using Rditil.ViewModels;
+using System.Windows.Controls;
 
 namespace Rditil.Views
 {

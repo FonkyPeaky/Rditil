@@ -1,7 +1,4 @@
-﻿using Rditil.Models;
-using Rditil.Services;
-using Rditil.ViewModels;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace Rditil.Views
 {
@@ -23,7 +20,7 @@ namespace Rditil.Views
 
             //var emailService = new EmailService(settings);
 
-           
+
         }
     }
 }
