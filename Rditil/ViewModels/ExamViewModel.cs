@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
 using Rditil.Data;
@@ -12,140 +12,141 @@ using System.Windows.Threading;
 
 namespace Rditil.ViewModels
 {
-    public class ExamFinishedEventArgs : EventArgs
-    {
-        public int Score { get; init; }
-        public int Total { get; init; }
-        public TimeSpan TimeUsed { get; init; }
-        public bool TimeExpired { get; init; }
-    }
-
     public partial class ExamViewModel : ObservableObject
     {
         private readonly AppDbContext _ctx;
         private readonly IEmailService _emailService;
-        private readonly string _managerEmail;
-        private readonly string _userEmail;
+        private readonly INavigationService _navigationService;
+
+        public Utilisateur CurrentUser { get; set; } = null!;
+        public string UserEmail { get; set; } = "";
+        public string ManagerEmail { get; set; } = "";
 
         private readonly DispatcherTimer _timer;
-        private DateTime _startUtc;
         private TimeSpan _remaining = TimeSpan.FromHours(1);
+        private DateTime _startedAtUtc;
+
+        private List<Question> _questions = new();
+        private int _index;
+        private int _score;
 
         [ObservableProperty] private string tempsRestantText = "01:00:00";
         [ObservableProperty] private Question questionEnCours = null!;
         [ObservableProperty] private ObservableCollection<ReponseChoix> reponsesChoix = new();
 
-        public string? UserFullName { get; set; }
-
-        private List<Question> _questions = new();
-        private int _index = 0;
-        private int _score = 0;
-
-        public event EventHandler<ExamFinishedEventArgs> ExamFinished;
+        // ✅ Pour l’affichage en haut (gauche) : "RDITIL • Question 3/40"
+        public string ProgressText => _questions.Count == 0 ? "0/0" : $"{Math.Min(_index + 1, _questions.Count)}/{_questions.Count}";
+        public string HeaderLeftText => $"RDITIL  •  Question {ProgressText}";
 
         public IAsyncRelayCommand QuestionSuivanteCommand { get; }
-        public IAsyncRelayCommand DemarrerCommand { get; }
 
-        public ExamViewModel(AppDbContext ctx, IEmailService emailService, string userEmail, string managerEmail)
+        public ExamViewModel(
+            AppDbContext ctx,
+            IEmailService emailService,
+            INavigationService navigationService)
         {
             _ctx = ctx;
             _emailService = emailService;
-            _userEmail = userEmail;
-            _managerEmail = managerEmail;
+            _navigationService = navigationService;
 
             QuestionSuivanteCommand = new AsyncRelayCommand(ValiderEtSuivantAsync);
-            DemarrerCommand = new AsyncRelayCommand(DemarrerAsync);
 
             _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _timer.Tick += (_, __) =>
             {
-                _remaining = _remaining - TimeSpan.FromSeconds(1);
+                _remaining -= TimeSpan.FromSeconds(1);
                 TempsRestantText = _remaining.ToString(@"hh\:mm\:ss");
+
                 if (_remaining <= TimeSpan.Zero)
                 {
                     _timer.Stop();
-                    Finish(timeExpired: true);
+                    FinishExam();
                 }
             };
         }
 
-        public async void Demarrer() => await DemarrerAsync();
-
-        private async System.Threading.Tasks.Task DemarrerAsync()
+        public async void OnNavigatedTo()
         {
-            _startUtc = DateTime.UtcNow;
+            _timer.Stop();
+
+            // ✅ infos utilisateur (pour l'écran de fin + email)
+            CurrentUser = App.CurrentUser ?? new Utilisateur();
+            UserEmail = CurrentUser.Email;
+            ManagerEmail = CurrentUser.EmailNPlus1;
+            
+
             _remaining = TimeSpan.FromHours(1);
             TempsRestantText = _remaining.ToString(@"hh\:mm\:ss");
-            _score = 0;
-            _index = 0;
 
-            // Tirage des 40 questions avec leurs réponses
             var all = await _ctx.Questions
                 .Include(q => q.Reponses)
                 .ToListAsync();
 
             _questions = all.OrderBy(_ => Guid.NewGuid()).Take(40).ToList();
+            _index = 0;
+            _score = 0;
 
-            ChargerQuestion(_index);
+            OnPropertyChanged(nameof(ProgressText));
+            OnPropertyChanged(nameof(HeaderLeftText));
+
+            ChargerQuestion();
+            _startedAtUtc = DateTime.UtcNow;
             _timer.Start();
         }
 
-        private void ChargerQuestion(int i)
+        private void ChargerQuestion()
         {
-            if (i < 0 || i >= _questions.Count) return;
-            QuestionEnCours = _questions[i];
+            if (_questions.Count == 0) return;
 
-            var items = QuestionEnCours.Reponses
-                .Select(r => new ReponseChoix
+            QuestionEnCours = _questions[_index];
+
+            ReponsesChoix = new ObservableCollection<ReponseChoix>(
+                QuestionEnCours.Reponses.Select(r => new ReponseChoix
                 {
                     Id = r.Id_Reponse,
-                    TextReponse = r.TextReponse ?? string.Empty,
+                    TextReponse = r.TextReponse ?? "",
                     EstCorrect = r.EstCorrect
-                })
-                .OrderBy(_ => Guid.NewGuid())
-                .ToList();
+                }));
 
-            ReponsesChoix = new ObservableCollection<ReponseChoix>(items);
+            OnPropertyChanged(nameof(ProgressText));
+            OnPropertyChanged(nameof(HeaderLeftText));
         }
 
         private async System.Threading.Tasks.Task ValiderEtSuivantAsync()
         {
-            // Correction : l’ensemble choisi doit égaler l’ensemble correct
-            var selected = ReponsesChoix.Where(x => x.IsChoisie).Select(x => x.Id).ToHashSet();
-            var correct = ReponsesChoix.Where(x => x.EstCorrect).Select(x => x.Id).ToHashSet();
+            var selected = ReponsesChoix.Where(r => r.IsChoisie).Select(r => r.Id).ToHashSet();
+            var correct = ReponsesChoix.Where(r => r.EstCorrect).Select(r => r.Id).ToHashSet();
+
             if (selected.SetEquals(correct))
                 _score++;
 
             _index++;
+
             if (_index < _questions.Count)
-            {
-                ChargerQuestion(_index);
-            }
+                ChargerQuestion();
             else
-            {
-                _timer.Stop();
-                Finish(timeExpired: false);
-            }
+                FinishExam();
 
             await System.Threading.Tasks.Task.CompletedTask;
         }
 
-        private void Finish(bool timeExpired)
+        private void FinishExam()
         {
-            var used = DateTime.UtcNow - _startUtc;
-            try
-            {
-                _ = _emailService.SendExamResultAsync(_managerEmail, _userEmail, _score, _questions.Count);
-            }
-            catch { /* ne bloque pas la fin si email KO */ }
+            _timer.Stop();
 
-            ExamFinished?.Invoke(this, new ExamFinishedEventArgs
+            // ✅ On garde le résultat en mémoire (la EndPage va l'afficher + permettre l'envoi mail)
+            App.LastExamResult = new Models.ExamResultSummary
             {
+                UserFullName = CurrentUser?.Nom ?? string.Empty,
+                UserEmail = UserEmail ?? string.Empty,
+                ManagerEmail = ManagerEmail ?? string.Empty,
                 Score = _score,
                 Total = _questions.Count,
-                TimeUsed = used,
-                TimeExpired = timeExpired
-            });
+                StartedAt = _startedAtUtc,
+                FinishedAt = DateTime.UtcNow
+            };
+
+            _navigationService.NavigateTo<EndPageViewModel>();
         }
     }
 }

@@ -1,14 +1,22 @@
-﻿using System.Windows.Controls;
-using Rditil.ViewModels;
+﻿using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media.Animation;
 
 namespace Rditil.Views
 {
     public partial class EndPage : Page
     {
-        public EndPage(ResultViewModel vm)
+        public EndPage()
         {
             InitializeComponent();
-            DataContext = vm;
+        }
+
+        private void Card_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (FindResource("FadeSlideIn") is Storyboard sb)
+            {
+                sb.Begin((FrameworkElement)sender);
+            }
         }
     }
 }

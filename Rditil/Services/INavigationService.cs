@@ -7,8 +7,7 @@ namespace Rditil.Services
     {
         void SetFrame(Frame frame);
 
-        void NavigateTo<TViewModel>(Dictionary<string, object>? parameters = null)
+        void NavigateTo<TViewModel>(Dictionary<string, object?>? parameters = null)
             where TViewModel : class;
-
     }
 }

@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Rditil.Navigation;
+using Rditil.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Controls;
-using Microsoft.Extensions.DependencyInjection;
-using Rditil.Navigation; // pour ViewModelPageMapper
 
 namespace Rditil.Services
 {
-
-    public sealed class NavigationService : INavigationService
+    public class NavigationService : INavigationService
     {
         private readonly IServiceProvider _sp;
         private Frame? _frame;
@@ -18,43 +18,46 @@ namespace Rditil.Services
             _sp = sp;
         }
 
-        public void SetFrame(Frame frame) => _frame = frame;
+        public void SetFrame(Frame frame)
+        {
+            _frame = frame;
+        }
 
-        // Implémente la signature attendue par TON interface
-        public void NavigateTo<TViewModel>(Dictionary<string, object?>? parameters = null) where TViewModel : class
+        public void NavigateTo<TViewModel>(Dictionary<string, object?>? parameters = null)
+            where TViewModel : class
         {
             NavigateTo(typeof(TViewModel), parameters);
         }
 
-
-        // Surcharge interne pratique (ta/ton interface n'a pas besoin de la déclarer)
-        private void NavigateTo(Type viewModelType, Dictionary<string, object?>? parameters = null)
+        private void NavigateTo(Type viewModelType, Dictionary<string, object?>? parameters)
         {
-            if (_frame is null)
-                throw new InvalidOperationException("Frame non initialisée. Appelle SetFrame() avant NavigateTo().");
+            if (_frame == null)
+                throw new InvalidOperationException("Frame non initialisée");
 
-            // 1) Trouver la Page associée à la VM
+            // 1️⃣ Page
             var pageType = ViewModelPageMapper.GetPageType(viewModelType);
+            var page = (Page)ActivatorUtilities.CreateInstance(_sp, pageType);
 
-            // 2) Résoudre la VM via DI
+            // 2️⃣ ViewModel
             var vm = _sp.GetRequiredService(viewModelType);
 
-            // 3) Appliquer les 'parameters' sur la VM si fournis (property bag)
-            if (parameters is not null)
+            // 3️⃣ Property bag
+            if (parameters != null)
             {
                 foreach (var (key, value) in parameters)
                 {
-                    var prop = viewModelType.GetProperty(key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
-                    if (prop is { CanWrite: true })
-                    {
-                        prop.SetValue(vm, value);
-                    }
+                    var prop = viewModelType.GetProperty(key,
+                        BindingFlags.Public | BindingFlags.Instance);
+
+                    prop?.SetValue(vm, value);
                 }
             }
 
-            // 4) Créer la Page et fixer DataContext
-            var page = (Page?)ActivatorUtilities.CreateInstance(_sp, pageType);
-            if (page is null) throw new InvalidOperationException($"Impossible d'instancier {pageType.Name}");
+            // 4️⃣ Hook navigation (examen)
+            if (vm is ExamViewModel examVm)
+            {
+                examVm.OnNavigatedTo();
+            }
 
             page.DataContext = vm;
             _frame.Navigate(page);

@@ -1,33 +1,38 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Rditil.Models;
+using Rditil.Services;
+using System.Collections.Generic;
 
 namespace Rditil.ViewModels
 {
-    public interface INavigable
+    public class WelcomeViewModel : ObservableObject
     {
-        void OnNavigatedTo(Dictionary<string, object>? parameters = null);
-    }
+        private readonly INavigationService _navigationService;
 
-    public class WelcomeViewModel : INotifyPropertyChanged, INavigable
-    {
-        private string _nomUtilisateur = "Utilisateur";
-        public string NomUtilisateur
+        public Utilisateur CurrentUser { get; set; } = null!;
+        public string ManagerEmail { get; set; } = "";
+
+        public string UserFullName =>
+            $"{CurrentUser.Prenom} {CurrentUser.Nom}";
+
+        public IRelayCommand StartExamCommand { get; }
+
+        public WelcomeViewModel(INavigationService navigationService)
         {
-            get => _nomUtilisateur;
-            set { _nomUtilisateur = value; OnPropertyChanged(); }
+            _navigationService = navigationService;
+            StartExamCommand = new RelayCommand(StartExam);
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-        private void OnPropertyChanged([CallerMemberName] string? name = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-
-        public void OnNavigatedTo(Dictionary<string, object>? parameters = null)
+        private void StartExam()
         {
-            // Récupère depuis App.CurrentUser (défini dans App.xaml.cs)
-            var u = App.CurrentUser;
-            NomUtilisateur = u?.Prenom ?? "Utilisateur";
+            _navigationService.NavigateTo<ExamViewModel>(
+                new Dictionary<string, object?>
+                {
+                    ["CurrentUser"] = CurrentUser,
+                    ["UserEmail"] = CurrentUser.Email,
+                    ["ManagerEmail"] = ManagerEmail
+                });
         }
     }
 }

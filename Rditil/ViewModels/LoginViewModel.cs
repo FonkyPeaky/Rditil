@@ -1,77 +1,49 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Rditil.Models;
 using Rditil.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Rditil.ViewModels
 {
-    public class LoginViewModel : INotifyPropertyChanged
+    public partial class LoginViewModel : ObservableObject
     {
         private readonly IUserService _userService;
         private readonly INavigationService _navigationService;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        [ObservableProperty] private string email = "";
+        [ObservableProperty] private string password = "";
+        [ObservableProperty] private string errorMessage = "";
 
-        private string _email;
-        public string Email
-        {
-            get => _email;
-            set { _email = value; OnPropertyChanged(); }
-        }
-
-        private string _password;
-        public string Password
-        {
-            get => _password;
-            set { _password = value; OnPropertyChanged(); }
-        }
-
-        private string _errorMessage;
-        public string ErrorMessage
-        {
-            get => _errorMessage;
-            set { _errorMessage = value; OnPropertyChanged(); }
-        }
-
-        public IAsyncRelayCommand LoginCommand { get; }
-        public IRelayCommand CreateAccountCommand { get; }
-
-        public LoginViewModel(IUserService userService, INavigationService navigationService)
+        public LoginViewModel(
+            IUserService userService,
+            INavigationService navigationService)
         {
             _userService = userService;
             _navigationService = navigationService;
+        }
 
-            // ✅ force l’AsyncRelayCommand du Toolkit, overload sans paramètre
-            LoginCommand = new CommunityToolkit.Mvvm.Input.AsyncRelayCommand(LoginAsync);
-
-            // ✅ commande sync
-            CreateAccountCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(NavigateToAdmin);
-        }                          
-
+        [RelayCommand]
         private async Task LoginAsync()
         {
-            ErrorMessage = string.Empty;
+            ErrorMessage = "";
 
             var user = await _userService.GetByEmailAsync(Email);
+
             if (user != null && BCrypt.Net.BCrypt.Verify(Password, user.PasswordHash))
             {
-                App.CurrentUser = user;
-                _navigationService.NavigateTo<WelcomeViewModel>();
+                _navigationService.NavigateTo<WelcomeViewModel>(
+                    new Dictionary<string, object?>
+                    {
+                        ["CurrentUser"] = user,
+                        ["ManagerEmail"] = "manager@entreprise.com"
+                    });
             }
             else
             {
-                ErrorMessage = "Email ou mot de passe incorrect.";
+                ErrorMessage = "Identifiants invalides";
             }
         }
-
-        private void NavigateToAdmin()
-        {
-            _navigationService.NavigateTo<AdminPanelViewModel>();
-        }
-
-        protected void OnPropertyChanged([CallerMemberName] string name = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

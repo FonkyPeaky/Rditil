@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Rditil.Models
 {
     public class Examen_Question
     {
-        public int Id_Examen { get; set; }
-        public Examen Examen { get; set; }
+        [Key]
+        public int Id_Exam { get; set; }
         public int Id_Question { get; set; }
-        public Question Question { get; set; }
+
+        public Examen? Examen { get; set; }
+        public Question? Question { get; set; }
     }
 }
-

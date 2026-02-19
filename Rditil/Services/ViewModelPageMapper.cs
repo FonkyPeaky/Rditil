@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Rditil.Views;
 using Rditil.ViewModels;
+using Rditil.Views;
 
 namespace Rditil.Navigation
 {
@@ -11,15 +11,15 @@ namespace Rditil.Navigation
         {
             { typeof(LoginViewModel), typeof(LoginPage) },
             { typeof(WelcomeViewModel), typeof(WelcomePage) },
-            { typeof(AdminPanelViewModel), typeof(AdminPanel) },
             { typeof(ExamViewModel), typeof(ExamenView) },
-            { typeof(QuestionViewModel), typeof(QuestionPage) },
-            { typeof(ResultViewModel), typeof(EndPage) },
+            { typeof(EndPageViewModel), typeof(EndPage) },
+            { typeof(AdminPanelViewModel), typeof(AdminPanel) }
         };
 
         public static Type GetPageType(Type viewModelType) =>
             Map.TryGetValue(viewModelType, out var page)
                 ? page
-                : throw new InvalidOperationException($"Page non trouvée pour {viewModelType.Name}");
+                : throw new InvalidOperationException(
+                    $"Page non trouvée pour {viewModelType.Name}");
     }
 }

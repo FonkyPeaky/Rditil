@@ -1,0 +1,15 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Color x:Key="White">#FFFFFFFF</Color>
+    <Color x:Key="BackgroundLight">#FFF7F9FC</Color>
+
+    <Color x:Key="PrimaryBlue">#FF0A7FBF</Color>
+    <Color x:Key="AccentCyan">#FF12C2E9</Color>
+    <Color x:Key="SuccessGreen">#FF7ED957</Color>
+
+    <Color x:Key="TextDark">#FF1F2937</Color>
+    <Color x:Key="TextMuted">#FF6B7280</Color>
+
+</ResourceDictionary>

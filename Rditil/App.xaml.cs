@@ -21,6 +21,13 @@ namespace Rditil
         // ✅ utilisateur courant accessible globalement
         public static Utilisateur? CurrentUser { get; set; }
 
+        // ✅ helpers pour la page de fin / reporting email
+        public static string CurrentUserFullName => CurrentUser?.Nom ?? string.Empty;
+        public static string ManagerEmail => CurrentUser?.EmailNPlus1 ?? string.Empty;
+
+        // Résumé du dernier examen (utilisé par EndPage)
+        public static Models.ExamResultSummary? LastExamResult { get; set; }
+
         public App()
         {
             AppHost = Host.CreateDefaultBuilder()
@@ -53,6 +60,8 @@ namespace Rditil
                     services.AddTransient<ExamViewModel>();
                     services.AddTransient<QuestionViewModel>();
                     services.AddTransient<ResultViewModel>();
+                    services.AddTransient<EndPageViewModel>();
+
 
                     // ✅ Pages
                     services.AddTransient<LoginPage>();
@@ -63,7 +72,11 @@ namespace Rditil
                     services.AddTransient<EndPage>();
 
                     // ✅ Fenêtre principale
-                    services.AddSingleton<MainWindow>();
+                    services.AddSingleton(sp =>
+                    {
+                        var cfg = sp.GetRequiredService<IConfiguration>();
+                        return cfg.GetSection("Smtp").Get<SmtpSettings>() ?? new SmtpSettings();
+                    });
                 })
                 .Build();
 
@@ -89,7 +102,7 @@ namespace Rditil
             {
                 var ctx = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 ctx.Database.EnsureCreated(); // ou ctx.Database.Migrate();
-                DbSeeder.Seed(ctx);
+                //DbSeeder.Seed(ctx);
             }
 
 

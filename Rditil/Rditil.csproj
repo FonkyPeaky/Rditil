@@ -7,17 +7,23 @@
     <UseWPF>true</UseWPF>
     <UserSecretsId>c98eca1f-a9c6-4433-bafe-50a46f81525f</UserSecretsId>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Common\AsyncRelayCommand.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Navigation\" />
-    <Folder Include="Resources\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Common\AsyncRelayCommand.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="EPPlus" Version="8.0.7" />
-    <PackageReference Include="MailKit" Version="4.13.0" />
+    <PackageReference Include="MailKit" Version="4.14.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
       <PrivateAssets>all</PrivateAssets>
