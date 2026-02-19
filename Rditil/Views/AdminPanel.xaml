@@ -4,69 +4,48 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       mc:Ignorable="d"
+      Background="Transparent"
       Loaded="Page_Loaded">
 
     <Page.Resources>
-        <!-- Dégradé clair -->
-        <LinearGradientBrush x:Key="GradientBg" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#F0F8FF" Offset="0"/>
-            <GradientStop Color="#D6E9FF" Offset="1"/>
-        </LinearGradientBrush>
+        <!-- Palette Randstad Digital -->
+        <Color x:Key="RD_Blue">#2E7DFF</Color>
+        <Color x:Key="RD_BlueDark">#0B2D5B</Color>
+        <Color x:Key="RD_Green">#18C37E</Color>
 
-        <DropShadowEffect x:Key="SoftShadow" Color="#000000"
-                          BlurRadius="18" ShadowDepth="0" Opacity="0.25"/>
+        <SolidColorBrush x:Key="BrushBlue" Color="{StaticResource RD_Blue}" />
+        <SolidColorBrush x:Key="BrushBlueDark" Color="{StaticResource RD_BlueDark}" />
+        <SolidColorBrush x:Key="BrushGreen" Color="{StaticResource RD_Green}" />
 
-        <!-- TextBox arrondie avec watermark -->
-        <Style TargetType="TextBox" x:Key="RoundedTextBox">
-            <Setter Property="Foreground" Value="#003366"/>
+        <!-- Glass -->
+        <SolidColorBrush x:Key="GlassWhite" Color="#CCFFFFFF" />
+        <SolidColorBrush x:Key="GlassBorder" Color="#55FFFFFF" />
+
+        <!-- Inputs -->
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Height" Value="42"/>
             <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="14,9"/>
+            <Setter Property="Foreground" Value="#1F2A44"/>
+            <Setter Property="Background" Value="#F6F8FF"/>
+            <Setter Property="BorderBrush" Value="#D7E3FF"/>
+            <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
-                        <Grid>
-                            <Border Background="#FFFFFFFF" CornerRadius="8"
-                                    BorderBrush="#88AADD" BorderThickness="1" Padding="10"/>
+                        <Border CornerRadius="12"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
                             <ScrollViewer x:Name="PART_ContentHost"/>
-                            <TextBlock x:Name="Watermark"
-                                       Text="{TemplateBinding Tag}"
-                                       Foreground="#8899AA"
-                                       Margin="14,0,0,0"
-                                       VerticalAlignment="Center"
-                                       IsHitTestVisible="False"
-                                       Visibility="Collapsed"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="Text" Value="">
-                                <Setter TargetName="Watermark" Property="Visibility" Value="Visible"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- PasswordBox arrondie -->
-        <Style TargetType="PasswordBox" x:Key="RoundedPasswordBox">
-            <Setter Property="Foreground" Value="#003366"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="PasswordBox">
-                        <Grid>
-                            <Border Background="#FFFFFFFF" CornerRadius="8"
-                                    BorderBrush="#88AADD" BorderThickness="1" Padding="10"/>
-                            <ScrollViewer x:Name="PART_ContentHost"/>
-                            <TextBlock x:Name="Watermark"
-                                       Text="{TemplateBinding Tag}"
-                                       Foreground="#8899AA"
-                                       Margin="14,0,0,0"
-                                       VerticalAlignment="Center"
-                                       IsHitTestVisible="False"
-                                       Visibility="Visible"/>
-                        </Grid>
+                        </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Watermark" Property="Visibility" Value="Collapsed"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource BrushBlue}"/>
+                                <Setter Property="BorderThickness" Value="1.4"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.7"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -74,22 +53,59 @@
             </Setter>
         </Style>
 
-        <!-- Bouton principal -->
-        <Style TargetType="Button" x:Key="PrimaryButton">
-            <Setter Property="Cursor" Value="Hand"/>
+        <Style x:Key="ModernComboBox" TargetType="ComboBox">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Foreground" Value="#1F2A44"/>
+            <Setter Property="Background" Value="#F6F8FF"/>
+            <Setter Property="BorderBrush" Value="#D7E3FF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- Green action button with hover/press -->
+        <Style x:Key="GreenButton" TargetType="Button">
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Background" Value="{StaticResource BrushGreen}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border CornerRadius="10" Background="#3A8DFF" Padding="10,5">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
+                        <Border x:Name="Bd" CornerRadius="14" Background="{TemplateBinding Background}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="22" ShadowDepth="10" Opacity="0.18"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#1E70E8"/>
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.95"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.9"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.99" ScaleY="0.99"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.55"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -97,59 +113,152 @@
             </Setter>
         </Style>
 
-        <!-- Animation d'entrée -->
+        <!-- Subtle blue secondary button -->
+        <Style x:Key="BlueChip" TargetType="Border">
+            <Setter Property="CornerRadius" Value="999"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Background" Value="#EEF4FF"/>
+            <Setter Property="BorderBrush" Value="#D7E3FF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- Entry animation -->
         <Storyboard x:Key="EnterStoryboard">
-            <DoubleAnimation Storyboard.TargetName="Card"
-                             Storyboard.TargetProperty="Opacity"
-                             From="0" To="1" Duration="0:0:0.4"/>
-            <DoubleAnimation Storyboard.TargetName="CardTranslate"
-                             Storyboard.TargetProperty="Y"
-                             From="15" To="0" Duration="0:0:0.4"/>
+            <DoubleAnimation Storyboard.TargetName="GlassCard" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.25"/>
+            <ThicknessAnimation Storyboard.TargetName="GlassCard" Storyboard.TargetProperty="Margin" From="0,25,0,0" To="0" Duration="0:0:0.25"/>
         </Storyboard>
     </Page.Resources>
 
-    <Grid Background="{StaticResource GradientBg}">
-        <Border x:Name="Card"
-                Width="600"
-                Padding="30"
+    <Grid>
+        <!-- Background: white dominant + Randstad blue band + soft motifs -->
+        <Grid>
+            <Rectangle Fill="#F6F9FF"/>
+
+            <Rectangle HorizontalAlignment="Right" Width="360">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#EAF2FF" Offset="0"/>
+                        <GradientStop Color="#2E7DFF" Offset="1"/>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+
+            <Ellipse Width="520" Height="520" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-220,-220,0,0" Opacity="0.23">
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop Color="#2E7DFF" Offset="0"/>
+                        <GradientStop Color="#002E7DFF" Offset="1"/>
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+                <Ellipse.Effect>
+                    <BlurEffect Radius="45"/>
+                </Ellipse.Effect>
+            </Ellipse>
+
+            <Ellipse Width="420" Height="420" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,120,0" Opacity="0.18">
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop Color="#0B2D5B" Offset="0"/>
+                        <GradientStop Color="#000B2D5B" Offset="1"/>
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+                <Ellipse.Effect>
+                    <BlurEffect Radius="55"/>
+                </Ellipse.Effect>
+            </Ellipse>
+        </Grid>
+
+        <!-- Glass card -->
+        <Border x:Name="GlassCard"
+                Width="920"
+                Padding="26"
+                CornerRadius="22"
+                Background="{StaticResource GlassWhite}"
+                BorderBrush="{StaticResource GlassBorder}"
+                BorderThickness="1"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                CornerRadius="16"
-                Background="White"
-                Effect="{StaticResource SoftShadow}"
-                Opacity="0"
-                RenderTransformOrigin="0.5,0.5">
-            <Border.RenderTransform>
-                <TranslateTransform x:Name="CardTranslate" Y="15"/>
-            </Border.RenderTransform>
+                Opacity="1">
 
-            <StackPanel>
-                <TextBlock Text="👤 Création d’un utilisateur"
-                           FontSize="22" FontWeight="Bold" Foreground="#003366"
-                           Margin="0,0,0,20"/>
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="38" ShadowDepth="18" Opacity="0.20"/>
+            </Border.Effect>
 
-                <TextBox Style="{StaticResource RoundedTextBox}"
-                         Text="{Binding NouvelUtilisateur.Nom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         Tag="Nom"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="18"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                <TextBox Style="{StaticResource RoundedTextBox}"
-                         Text="{Binding NouvelUtilisateur.Prenom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         Tag="Prénom"/>
+                <!-- Header -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                <TextBox Style="{StaticResource RoundedTextBox}"
-                         Text="{Binding NouvelUtilisateur.Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         Tag="Email"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="👤" FontSize="24" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <StackPanel>
+                            <TextBlock Text="Création d’un utilisateur" FontSize="30" FontWeight="Bold" Foreground="{StaticResource BrushBlueDark}"/>
+                            <TextBlock Text="Admin • Gestion des utilisateurs" FontSize="12" Foreground="#6A7A96" Margin="2,3,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
 
-                <PasswordBox x:Name="PasswordBox"
-                             Style="{StaticResource RoundedPasswordBox}"
-                             Tag="Mot de passe"
-                             PasswordChanged="PasswordBox_PasswordChanged"/>
+                    <Border Grid.Column="1" Style="{StaticResource BlueChip}" VerticalAlignment="Center" Height="39">
+                        <TextBlock Text="N+1 par défaut : Marina Bras" Foreground="{StaticResource BrushBlueDark}" FontWeight="SemiBold" Margin="1,3,-1,-3"/>
+                    </Border>
+                </Grid>
 
-                <Button Content="Ajouter l’utilisateur"
-                        Style="{StaticResource PrimaryButton}"
-                        Command="{Binding AjouterCommand}"
-                        Margin="0,10,0,0"/>
-            </StackPanel>
+                <!-- Form -->
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="28"/>
+                        <ColumnDefinition Width="320"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left: inputs -->
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Prénom" Foreground="{StaticResource BrushBlueDark}" FontWeight="SemiBold" Margin="2,0,0,6"/>
+                        <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding Prenom, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Text="Nom" Foreground="{StaticResource BrushBlueDark}" FontWeight="SemiBold" Margin="2,14,0,6"/>
+                        <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding Nom, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Text="Email" Foreground="{StaticResource BrushBlueDark}" FontWeight="SemiBold" Margin="2,14,0,6"/>
+                        <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="Astuce : prénom + nom génèrent automatiquement prenom.nom@randstaddigital.lu" Foreground="#7E8BA5" FontSize="12" Margin="4,6,0,0"/>
+
+                        <TextBlock Text="N+1 (destinataire des résultats)" Foreground="{StaticResource BrushBlueDark}" FontWeight="SemiBold" Margin="2,14,0,6"/>
+                        <ComboBox Style="{StaticResource ModernComboBox}" ItemsSource="{Binding NPlusOneOptions}" SelectedItem="{Binding SelectedNPlusOne}" DisplayMemberPath="Name"/>
+
+                        <TextBlock Text="Mot de passe (min 5 caractères)" Foreground="{StaticResource BrushBlueDark}" FontWeight="SemiBold" Margin="2,14,0,6"/>
+                        <PasswordBox x:Name="PasswordBox" Height="42" FontSize="14" Padding="14,9" Background="#F6F8FF" BorderBrush="#D7E3FF" BorderThickness="1" PasswordChanged="PasswordBox_PasswordChanged" />
+
+                        <Button Margin="0,18,0,0" Style="{StaticResource GreenButton}" Content="Ajouter l'utilisateur" Command="{Binding AjouterCommand}" />
+                    </StackPanel>
+
+                    <!-- Right: quick help -->
+                    <Border Grid.Column="2" CornerRadius="16" Background="#FFFFFF" BorderBrush="#E7EEFF" BorderThickness="1" Padding="18">
+                        <StackPanel>
+                            <TextBlock Text="Règles" FontSize="16" FontWeight="Bold" Foreground="{StaticResource BrushBlueDark}"/>
+
+                            <StackPanel Margin="0,12,0,0">
+                                <TextBlock Text="• Email auto : prenom.nom@randstaddigital.lu" Foreground="#344767"/>
+                                <TextBlock Text="• Mot de passe : 5 caractères minimum" Foreground="#344767" Margin="0,6,0,0"/>
+                                <TextBlock Text="• N+1 enregistré en base (EmailNPlus1)" Foreground="#344767" Margin="0,6,0,0"/>
+                            </StackPanel>
+
+                            <Border Margin="0,16,0,0" CornerRadius="12" Background="#F6F8FF" Padding="12" BorderBrush="#D7E3FF" BorderThickness="1">
+                                <TextBlock TextWrapping="Wrap" Foreground="#5B6B86"
+                                           Text="Conseil : si l'email doit être différent exceptionnellement, tu peux le modifier manuellement — l'auto-remplissage s'arrête automatiquement."/>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
         </Border>
     </Grid>
 </Page>

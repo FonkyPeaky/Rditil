@@ -6,6 +6,9 @@ namespace Rditil.Models
 {
     public class Examen
     {
+        public ICollection<ExamAttempt> Attempts { get; set; } = [];
+
+
         [Key]
         public int Id_Examen { get; set; }
 
@@ -18,6 +21,6 @@ namespace Rditil.Models
         public int Id_Utilisateur { get; set; }
         public Utilisateur Utilisateur { get; set; } = null!;
 
-        public ICollection<Examen_Question> ExamenQuestions { get; set; } = new List<Examen_Question>();
+        public ICollection<Examen_Question> ExamenQuestions { get; set; } = [];
     }
 }

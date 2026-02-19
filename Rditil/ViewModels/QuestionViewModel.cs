@@ -1,85 +1,135 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.EntityFrameworkCore;
-using Rditil.Data;
-using Rditil.Models;
+﻿using System;
 using System.Collections.ObjectModel;
-using System.Timers;
-using System.Windows;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using System.Windows.Threading;
-using Timer = System.Timers.Timer;
+using Rditil;
+
 
 namespace Rditil.ViewModels
 {
-    public class QuestionViewModel : ObservableObject
+    public class QuestionChoiceVM : INotifyPropertyChanged
     {
-        private Timer _timer;
-        private TimeSpan _tempsRestant;
-        private int _index;
-        private string _tempsRestantAffiche;
+        private bool _isSelected;
 
-        public ObservableCollection<Question> QuestionsTirees { get; set; }
-        public Question QuestionEnCours { get; set; }
-        public ObservableCollection<ReponseChoix> ReponsesEnCours { get; set; }
+        public int Id { get; set; }
+        public string Text { get; set; } = "";
 
-        public string TempsRestantAffiche
+        public bool IsSelected
         {
-            get => _tempsRestantAffiche;
-            set => SetProperty(ref _tempsRestantAffiche, value);
+            get => _isSelected;
+            set { _isSelected = value; OnPropertyChanged(); }
         }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string? n = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(n));
+    }
+
+    public class QuestionViewModel : INotifyPropertyChanged
+    {
+        private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromSeconds(1) };
+        private TimeSpan _remaining = TimeSpan.FromHours(1);
+
+        private string _currentQuestionText = "";
+        private int _currentIndex = 1;
+        private int _totalQuestions = 40;
+
+        public ObservableCollection<QuestionChoiceVM> Choices { get; } = new();
+
+        public string CurrentQuestionText
+        {
+            get => _currentQuestionText;
+            set { _currentQuestionText = value; OnPropertyChanged(); }
+        }
+
+        public int CurrentIndex
+        {
+            get => _currentIndex;
+            set { _currentIndex = value; OnPropertyChanged(); }
+        }
+
+        public int TotalQuestions
+        {
+            get => _totalQuestions;
+            set { _totalQuestions = value; OnPropertyChanged(); }
+        }
+
+        public string RemainingTimeText => _remaining.ToString(@"hh\:mm\:ss");
+
+        public bool CanGoNext => Choices.Any(c => c.IsSelected);
+
+        public string NextButtonText => (CurrentIndex >= TotalQuestions) ? "Terminer" : "Suivant";
+
+        public ICommand NextCommand { get; }
 
         public QuestionViewModel()
         {
-            QuestionsTirees = new ObservableCollection<Question>();
-            ReponsesEnCours = new ObservableCollection<ReponseChoix>();
+            NextCommand = new RelayCommand(_ => GoNext(), _ => CanGoNext);
 
-            _tempsRestant = TimeSpan.FromMinutes(60);
-            TempsRestantAffiche = _tempsRestant.ToString(@"mm\:ss");
-
-            _timer = new Timer(1000);
-            _timer.Elapsed += (sender, e) =>
+            _timer.Tick += (_, __) =>
             {
-                _tempsRestant = _tempsRestant.Subtract(TimeSpan.FromSeconds(1));
-
-                TempsRestantAffiche = _tempsRestant.ToString(@"mm\:ss");
-                OnPropertyChanged(nameof(TempsRestantAffiche));
-
-                if (_tempsRestant <= TimeSpan.Zero)
+                if (_remaining > TimeSpan.Zero)
+                {
+                    _remaining = _remaining.Subtract(TimeSpan.FromSeconds(1));
+                    OnPropertyChanged(nameof(RemainingTimeText));
+                }
+                else
                 {
                     _timer.Stop();
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        MessageBox.Show("Temps écoulé !", "Fin de l'examen", MessageBoxButton.OK, MessageBoxImage.Information);
-                        // Logique pour terminer l'examen
-                    });
                 }
             };
-            _timer.Start();
+
+            Choices.CollectionChanged += (_, __) => RefreshCanExecute();
         }
 
-        private void ChargerQuestion(int index)
-        {
-            if (index < 0 || index >= QuestionsTirees.Count) return;
-            QuestionEnCours = QuestionsTirees[index];
-            ReponsesEnCours.Clear();
-        }
+        //public void StartTimer()
+        //{
+        //    _timer.Start();
+        //    OnPropertyChanged(nameof(RemainingTimeText));
+        //}
 
-        private void PasserQuestionSuivante()
+        public void StopTimer() => _timer.Stop();
+
+        public void LoadQuestion(string question, (int id, string txt)[] answers, int index, int total)
         {
-            if (_index < QuestionsTirees.Count - 1)
-            {
-                _index++;
-                ChargerQuestion(_index);
-            }
-            else
-            {
-                _timer.Stop();
-                Application.Current.Dispatcher.Invoke(() =>
+            CurrentQuestionText = question;
+            CurrentIndex = index;
+            TotalQuestions = total;
+
+            Choices.Clear();
+            foreach (var a in answers)
+                Choices.Add(new QuestionChoiceVM { Id = a.id, Text = a.txt });
+
+            foreach (var c in Choices)
+                c.PropertyChanged += (_, e) =>
                 {
-                    MessageBox.Show("Examen terminé !", "Fin de l'examen", MessageBoxButton.OK, MessageBoxImage.Information);
-                    // Logique pour terminer l'examen
-                });
-            }
+                    if (e.PropertyName == nameof(QuestionChoiceVM.IsSelected))
+                        RefreshCanExecute();
+                };
+
+            RefreshCanExecute();
+            OnPropertyChanged(nameof(NextButtonText));
         }
+
+        private void GoNext()
+        {
+            var selected = Choices.Where(c => c.IsSelected).ToList();
+        }
+
+        private void RefreshCanExecute()
+        {
+            OnPropertyChanged(nameof(CanGoNext));
+            OnPropertyChanged(nameof(NextButtonText));
+
+            if (NextCommand is RelayCommand rc)
+                rc.RaiseCanExecuteChanged();
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string? n = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(n));
     }
 }

@@ -1,38 +1,42 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Rditil.Models;
 using Rditil.Services;
-using System.Collections.Generic;
 
 namespace Rditil.ViewModels
 {
-    public class WelcomeViewModel : ObservableObject
+    public interface INavigable
     {
-        private readonly INavigationService _navigationService;
+        void OnNavigatedTo(Dictionary<string, object>? parameters = null);
+    }
 
-        public Utilisateur CurrentUser { get; set; } = null!;
-        public string ManagerEmail { get; set; } = "";
+    public class WelcomeViewModel : INotifyPropertyChanged, INavigable
+    {
+        private readonly IAppState _appState;
 
-        public string UserFullName =>
-            $"{CurrentUser.Prenom} {CurrentUser.Nom}";
-
-        public IRelayCommand StartExamCommand { get; }
-
-        public WelcomeViewModel(INavigationService navigationService)
+        private string _nomUtilisateur = "Utilisateur";
+        public string NomUtilisateur
         {
-            _navigationService = navigationService;
-            StartExamCommand = new RelayCommand(StartExam);
+            get => _nomUtilisateur;
+            set { _nomUtilisateur = value; OnPropertyChanged(); }
         }
 
-        private void StartExam()
+        public Utilisateur? Utilisateur => _appState.CurrentUser;
+
+        public WelcomeViewModel(IAppState appState)
         {
-            _navigationService.NavigateTo<ExamViewModel>(
-                new Dictionary<string, object?>
-                {
-                    ["CurrentUser"] = CurrentUser,
-                    ["UserEmail"] = CurrentUser.Email,
-                    ["ManagerEmail"] = ManagerEmail
-                });
+            _appState = appState;
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string? name = null) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        public void OnNavigatedTo(Dictionary<string, object>? parameters = null)
+        {
+            var u = _appState.CurrentUser;
+            NomUtilisateur = u?.Prenom ?? "Utilisateur";
         }
     }
 }

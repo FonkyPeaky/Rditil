@@ -6,24 +6,21 @@ namespace Rditil.Views
 {
     public partial class ExamenView : Page
     {
-        private readonly ExamViewModel _vm;
-        private bool _initialized;
-
         public ExamenView(ExamViewModel vm)
         {
             InitializeComponent();
-            _vm = vm;
-            DataContext = _vm;
-
-            Loaded += ExamView_Loaded;
+            System.Diagnostics.Debug.WriteLine($"[ExamenView] Constructor - VM instance: {vm.GetHashCode()}");
+            DataContext = vm;
         }
 
-        private void ExamView_Loaded(object sender, RoutedEventArgs e)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            if (_initialized) return;
-            _initialized = true;
-
-            _vm.OnNavigatedTo();
+            System.Diagnostics.Debug.WriteLine($"[ExamenView] Page_Loaded - DataContext: {DataContext?.GetType().Name}");
+            if (DataContext is ExamViewModel examVm)
+            {
+                System.Diagnostics.Debug.WriteLine($"[ExamenView] Calling EnsureLoadedAsync manually");
+                _ = examVm.EnsureLoadedAsync();
+            }
         }
     }
 }

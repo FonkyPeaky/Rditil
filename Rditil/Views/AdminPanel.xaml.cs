@@ -7,10 +7,18 @@ namespace Rditil.Views
 {
     public partial class AdminPanel : Page
     {
-        public AdminPanel()
+        public AdminPanel(AdminPanelViewModel vm)
         {
             InitializeComponent();
+            DataContext = vm;
+
+            vm.RequestClose += () =>
+            {
+                var w = Window.GetWindow(this);
+                w?.Close();
+            };
         }
+
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
@@ -21,9 +29,7 @@ namespace Rditil.Views
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
             if (DataContext is AdminPanelViewModel vm && sender is PasswordBox pb)
-            {
                 vm.MotDePasse = pb.Password;
-            }
         }
     }
 }

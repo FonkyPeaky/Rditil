@@ -26,7 +26,7 @@ namespace Rditil.Services
         {
             return _context.Questions
                 .Include(q => q.Reponses)
-                .FirstOrDefault(q => q.Id_Question == id);
+                .FirstOrDefault(q => q.Id == id);
         }
     }
 }

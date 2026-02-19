@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Rditil.Data;
 using Rditil.Models;
-//using Rditil.AppDbContext; // adapte si ton DbContext est dans un autre namespace
 using System.Threading.Tasks;
 
 namespace Rditil.Services
@@ -16,21 +15,34 @@ namespace Rditil.Services
 
     public class UserService : IUserService
     {
-        private readonly AppDbContext _ctx;
-        public UserService(AppDbContext ctx) => _ctx = ctx;
+        private readonly IDbContextFactory<AppDbContext> _dbFactory;
 
-        public Task<Utilisateur?> GetByIdAsync(int id) =>
-            _ctx.Utilisateurs.FirstOrDefaultAsync(u => u.Id_Utilisateur == id);
+        public UserService(IDbContextFactory<AppDbContext> dbFactory)
+            => _dbFactory = dbFactory;
 
-        public Task<Utilisateur?> GetByEmailAsync(string email) =>
-            _ctx.Utilisateurs.FirstOrDefaultAsync(u => u.Email == email);
+        public async Task<Utilisateur?> GetByIdAsync(int id)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+            return await db.Utilisateurs.FirstOrDefaultAsync(u => u.Id_Utilisateur == id);
+        }
+
+        public async Task<Utilisateur?> GetByEmailAsync(string email)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+            return await db.Utilisateurs.FirstOrDefaultAsync(u => u.Email == email);
+        }
 
         public async Task AddAsync(Utilisateur user)
         {
-            await _ctx.Utilisateurs.AddAsync(user);
-            await _ctx.SaveChangesAsync();
+            await using var db = await _dbFactory.CreateDbContextAsync();
+            await db.Utilisateurs.AddAsync(user);
+            await db.SaveChangesAsync();
         }
 
-        public Task SaveAsync() => _ctx.SaveChangesAsync();
+        public async Task SaveAsync()
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+            await db.SaveChangesAsync();
+        }
     }
 }

@@ -9,11 +9,11 @@ namespace Rditil.Navigation
     {
         private static readonly Dictionary<Type, Type> Map = new()
         {
-            { typeof(LoginViewModel), typeof(LoginPage) },
             { typeof(WelcomeViewModel), typeof(WelcomePage) },
             { typeof(ExamViewModel), typeof(ExamenView) },
             { typeof(EndPageViewModel), typeof(EndPage) },
-            { typeof(AdminPanelViewModel), typeof(AdminPanel) }
+            { typeof(AdminPanelViewModel), typeof(AdminPanel) },
+            { typeof(ProgressViewModel), typeof(ProgressPage) }
         };
 
         public static Type GetPageType(Type viewModelType) =>

@@ -1,50 +1,652 @@
-﻿<Page x:Class="Rditil.Views.WelcomePage"
+<Page x:Class="Rditil.Views.WelcomePage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Background="{StaticResource BgLight}">
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      Title="Accueil - Examen ITIL"
+      Loaded="Page_Loaded">
 
-    <Grid>
-        <Border Style="{StaticResource Card}"
-                Width="900"
-                Opacity="0"
-                Loaded="Card_Loaded"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center">
+    <Page.Resources>
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <!-- PALETTE RANDSTAD DIGITAL -->
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <Color x:Key="RD_NavyDeep">#0B1236</Color>
+        <Color x:Key="RD_Navy">#111A43</Color>
+        <Color x:Key="RD_Blue">#2F6DFF</Color>
+        <Color x:Key="RD_BlueSoft">#5C8BFF</Color>
+        <Color x:Key="RD_BlueDark">#0B2D5B</Color>
+        <Color x:Key="RD_Green">#18C37E</Color>
 
-            <StackPanel HorizontalAlignment="Center">
+        <SolidColorBrush x:Key="BrushNavyDeep" Color="{StaticResource RD_NavyDeep}"/>
+        <SolidColorBrush x:Key="BrushNavy" Color="{StaticResource RD_Navy}"/>
+        <SolidColorBrush x:Key="BrushBlue" Color="{StaticResource RD_Blue}"/>
+        <SolidColorBrush x:Key="BrushBlueSoft" Color="{StaticResource RD_BlueSoft}"/>
+        <SolidColorBrush x:Key="BrushGreen" Color="{StaticResource RD_Green}"/>
 
-                <TextBlock Text="Bienvenue"
-                           Style="{StaticResource TitleText}"/>
+        <!-- Left panel gradient -->
+        <LinearGradientBrush x:Key="LeftPanelGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#0B1236" Offset="0"/>
+            <GradientStop Color="#111A43" Offset="0.5"/>
+            <GradientStop Color="#2F6DFF" Offset="1"/>
+        </LinearGradientBrush>
 
-                <TextBlock Text="{Binding UserFullName}"
-                           FontSize="20"
-                           Foreground="{StaticResource TextMutedBrush}"
-                           HorizontalAlignment="Center"
-                           Margin="0,4,0,24"/>
+        <!-- Card shadows et effets -->
+        <DropShadowEffect x:Key="CardShadow" BlurRadius="50" ShadowDepth="15" Opacity="0.08" Color="#0B2D5B"/>
+        <DropShadowEffect x:Key="ButtonGlow" BlurRadius="25" ShadowDepth="8" Opacity="0.3" Color="#18C37E"/>
+        <DropShadowEffect x:Key="BlueGlow" BlurRadius="25" ShadowDepth="8" Opacity="0.3" Color="#2F6DFF"/>
 
-                <TextBlock Text="Examen blanc ITIL"
-                           FontSize="22"
-                           FontWeight="SemiBold"
-                           HorizontalAlignment="Center"
-                           Margin="0,0,0,16"/>
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <!-- STYLES -->
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
 
-                <TextBlock Text="Merci de respecter les consignes :"
-                           HorizontalAlignment="Center"
-                           Margin="0,0,0,8"/>
+        <!-- Bouton Principal -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Height" Value="54"/>
+            <Setter Property="MinWidth" Value="200"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button" >
+                        <Border x:Name="Bd" CornerRadius="14" >
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#2F6DFF" Offset="0"/>
+                                    <GradientStop Color="#5C8BFF" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="25" ShadowDepth="8" Opacity="0.3" Color="#18C37E"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#1DD48A" Offset="0"/>
+                                            <GradientStop Color="#18C37E" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-                <TextBlock Text="- Interdiction d’utiliser le téléphone
-- Respecter le temps imparti d’une heure
-- Votre responsable recevra le résultat par mail"
-                           TextAlignment="Center"
-                           Margin="0,0,0,24"/>
+        <!-- Bouton Secondaire -->
+        <Style x:Key="SecondaryButton" TargetType="Button">
+            <Setter Property="Height" Value="54"/>
+            <Setter Property="MinWidth" Value="180"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#18FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#25FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" CornerRadius="14"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#30FFFFFF"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-                <Button Content="Commencer"
-                        Width="220"
-                        Style="{StaticResource PrimaryButton}"
-                        Command="{Binding StartExamCommand}"
-                        HorizontalAlignment="Center"/>
+        <!-- Style pour les cards du panneau droit -->
+        <Style x:Key="StatCard" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Padding" Value="24"/>
+            <Setter Property="Effect" Value="{StaticResource CardShadow}"/>
+        </Style>
 
-            </StackPanel>
+        <!-- Style pour les action chips -->
+        <Style x:Key="ActionChip" TargetType="Border">
+            <Setter Property="Background" Value="#F0F6FF"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="BorderBrush" Value="#D0E0FF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <!-- ANIMATIONS -->
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <Storyboard x:Key="EnterStoryboard">
+            <DoubleAnimation Storyboard.TargetName="MainGrid" Storyboard.TargetProperty="Opacity"
+                             From="0" To="1" Duration="0:0:0.5">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <Storyboard x:Key="LeftPanelSlideIn">
+            <DoubleAnimation Storyboard.TargetName="LeftPanel"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                             From="-60" To="0" Duration="0:0:0.7">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="LeftPanel"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0" To="1" Duration="0:0:0.6"/>
+        </Storyboard>
+
+        <Storyboard x:Key="RightPanelSlideIn">
+            <DoubleAnimation Storyboard.TargetName="RightPanel"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                             From="60" To="0" Duration="0:0:0.7" BeginTime="0:0:0.1">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="RightPanel"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0" To="1" Duration="0:0:0.6" BeginTime="0:0:0.1"/>
+        </Storyboard>
+
+        <Storyboard x:Key="ContentFadeIn">
+            <DoubleAnimation Storyboard.TargetName="LeftContent"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                             From="30" To="0" Duration="0:0:0.8" BeginTime="0:0:0.2">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="LeftContent"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0" To="1" Duration="0:0:0.7" BeginTime="0:0:0.2"/>
+        </Storyboard>
+
+        <!-- Floating orbs animation -->
+        <Storyboard x:Key="OrbFloat1" RepeatBehavior="Forever" AutoReverse="True">
+            <DoubleAnimation Storyboard.TargetName="Orb1"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                             From="0" To="-25" Duration="0:0:3">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <Storyboard x:Key="OrbFloat2" RepeatBehavior="Forever" AutoReverse="True">
+            <DoubleAnimation Storyboard.TargetName="Orb2"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                             From="0" To="20" Duration="0:0:3.5">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <Storyboard x:Key="OrbFloat3" RepeatBehavior="Forever" AutoReverse="True">
+            <DoubleAnimation Storyboard.TargetName="Orb3"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                             From="0" To="-18" Duration="0:0:4">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <!-- Score pulse -->
+        <Storyboard x:Key="ScorePulse" RepeatBehavior="Forever" AutoReverse="True">
+            <DoubleAnimation Storyboard.TargetName="ScoreGlow"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0.3" To="0.7" Duration="0:0:2">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </Page.Resources>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <!-- CONTENU PRINCIPAL -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <Grid x:Name="MainGrid" Opacity="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.15*"/>
+            <ColumnDefinition Width="0.85*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <!-- PANNEAU GAUCHE - GRADIENT RANDSTAD -->
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <Border x:Name="LeftPanel" Grid.Column="0" Background="{StaticResource LeftPanelGradient}" Opacity="0">
+            <Border.RenderTransform>
+                <TranslateTransform X="60"/>
+            </Border.RenderTransform>
+
+            <Grid>
+                <!-- Animated floating orbs -->
+                <Ellipse x:Name="Orb1" Width="300" Height="300"
+                         HorizontalAlignment="Left" VerticalAlignment="Top"
+                         Margin="-100,-80,0,0" Opacity="0.18">
+                    <Ellipse.RenderTransform>
+                        <TranslateTransform/>
+                    </Ellipse.RenderTransform>
+                    <Ellipse.Fill>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#2F6DFF" Offset="0"/>
+                            <GradientStop Color="#002F6DFF" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                    <Ellipse.Effect>
+                        <BlurEffect Radius="40"/>
+                    </Ellipse.Effect>
+                </Ellipse>
+
+                <Ellipse x:Name="Orb2" Width="250" Height="250"
+                         HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                         Margin="0,0,-60,-60" Opacity="0.2">
+                    <Ellipse.RenderTransform>
+                        <TranslateTransform/>
+                    </Ellipse.RenderTransform>
+                    <Ellipse.Fill>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#18C37E" Offset="0"/>
+                            <GradientStop Color="#0018C37E" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                    <Ellipse.Effect>
+                        <BlurEffect Radius="50"/>
+                    </Ellipse.Effect>
+                </Ellipse>
+
+                <Ellipse x:Name="Orb3" Width="180" Height="180"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"
+                         Margin="120,150,0,0" Opacity="0.12">
+                    <Ellipse.RenderTransform>
+                        <TranslateTransform/>
+                    </Ellipse.RenderTransform>
+                    <Ellipse.Fill>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#5C8BFF" Offset="0"/>
+                            <GradientStop Color="#005C8BFF" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                    <Ellipse.Effect>
+                        <BlurEffect Radius="35"/>
+                    </Ellipse.Effect>
+                </Ellipse>
+
+                <!-- Contenu gauche -->
+                <Grid x:Name="LeftContent" Margin="50,40,50,40" Opacity="0">
+                    <Grid.RenderTransform>
+                        <TranslateTransform Y="30"/>
+                    </Grid.RenderTransform>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Logo + Brand -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <Image Source="/Resources/randstaddigitalluxembourg_logo.jfif"
+                               Width="140"
+                               VerticalAlignment="Center" Margin="490,0,0,0"/>
+                        <StackPanel VerticalAlignment="Center" Margin="20,0,0,0">
+                            <TextBlock Text="RD-ITIL" FontSize="24" FontWeight="Bold" Foreground="White" FontFamily="Segoe UI"/>
+                            <TextBlock Text="Plateforme d'examen" FontSize="13" Foreground="#A0FFFFFF" FontFamily="Segoe UI"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Contenu principal -->
+                    <StackPanel Grid.Row="1" VerticalAlignment="Top" Margin="0,-30,0,0">
+                        <!-- Message motivationnel -->
+                        <Border Background="#15FFFFFF" CornerRadius="12" Padding="16,12"
+                                HorizontalAlignment="Left" Margin="0,0,0,20">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🎯" FontSize="16" VerticalAlignment="Center"/>
+                                <TextBlock Text="Prêt à relever le défi ITIL ?"
+                                           Foreground="#D0FFFFFF" FontSize="14" FontFamily="Segoe UI"
+                                           VerticalAlignment="Center" Margin="12,0,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Titre -->
+                        <TextBlock Text="Examen Blanc" FontSize="48" FontWeight="ExtraBold"
+                                   Foreground="White" FontFamily="Segoe UI"/>
+                        <TextBlock Text="ITIL 4 Foundation" FontSize="48" FontWeight="ExtraBold"
+                                   FontFamily="Segoe UI" Margin="0,-4,0,0">
+                            <TextBlock.Foreground>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#5C8BFF" Offset="0"/>
+                                    <GradientStop Color="#18C37E" Offset="1"/>
+                                </LinearGradientBrush>
+                            </TextBlock.Foreground>
+                        </TextBlock>
+
+                        <TextBlock Text="Testez vos connaissances avec un examen blanc complet. 40 questions QCM en conditions réelles."
+                                   Foreground="#B0FFFFFF" FontSize="15" FontFamily="Segoe UI"
+                                   TextWrapping="Wrap" MaxWidth="390" Margin="0,16,10,30" LineHeight="24" HorizontalAlignment="Left"/>
+
+                        <!-- Boutons -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,40">
+                            <Button x:Name="StartButton" Content="🚀  Démarrer l'examen"
+                                    Style="{StaticResource PrimaryButton}"
+                                    Click="StartButton_Click"/>
+                            <Button x:Name="ProgressButton" Content="📊  Ma progression"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Click="ProgressButton_Click" Margin="16,0,0,0"/>
+                        </StackPanel>
+
+                        <!-- Features -->
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                <Border Background="#20FFFFFF" CornerRadius="10" Width="36" Height="36">
+                                    <TextBlock Text="✓" FontSize="16" FontWeight="Bold" Foreground="#18C37E"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="40 questions en 60 minutes"
+                                           Foreground="#D0FFFFFF" FontSize="14" FontFamily="Segoe UI"
+                                           VerticalAlignment="Center" Margin="14,0,0,0"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                <Border Background="#20FFFFFF" CornerRadius="10" Width="36" Height="36">
+                                    <TextBlock Text="✓" FontSize="16" FontWeight="Bold" Foreground="#18C37E"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="Résultats envoyés automatiquement à votre N+1"
+                                           Foreground="#D0FFFFFF" FontSize="14" FontFamily="Segoe UI"
+                                           VerticalAlignment="Center" Margin="14,0,0,0"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
+                                <Border Background="#20FFFFFF" CornerRadius="10" Width="36" Height="36">
+                                    <TextBlock Text="✓" FontSize="16" FontWeight="Bold" Foreground="#18C37E"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="Suivi de progression et statistiques"
+                                           Foreground="#D0FFFFFF" FontSize="14" FontFamily="Segoe UI"
+                                           VerticalAlignment="Center" Margin="14,0,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Footer -->
+                    <TextBlock Grid.Row="2" Text="© Randstad Digital 2026"
+                               Foreground="#70FFFFFF" FontSize="12" FontFamily="Segoe UI"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <!-- PANNEAU DROIT - STATISTIQUES -->
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <Border x:Name="RightPanel" Grid.Column="1" Background="#F8FAFF" Opacity="0">
+            <Border.RenderTransform>
+                <TranslateTransform X="60"/>
+            </Border.RenderTransform>
+
+            <Grid>
+                <!-- Decorative elements -->
+                <Ellipse Width="400" Height="400"
+                         HorizontalAlignment="Right" VerticalAlignment="Top"
+                         Margin="0,-150,-150,0" Opacity="0.5">
+                    <Ellipse.Fill>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#E8F0FF" Offset="0"/>
+                            <GradientStop Color="#00E8F0FF" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                </Ellipse>
+
+                <Ellipse Width="300" Height="300"
+                         HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                         Margin="-100,0,0,-100" Opacity="0.4">
+                    <Ellipse.Fill>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#E0F5EC" Offset="0"/>
+                            <GradientStop Color="#00E0F5EC" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                </Ellipse>
+
+                <!-- Contenu -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="36,40,36,40">
+                    <StackPanel>
+                        <!-- Header -->
+                        <TextBlock Text="Tableau de bord" FontSize="26" FontWeight="Bold"
+                                   Foreground="{StaticResource BrushNavyDeep}" FontFamily="Segoe UI"/>
+                        <TextBlock Text="Suivez votre progression en temps réel"
+                                   FontSize="14" Foreground="#667085" FontFamily="Segoe UI" Margin="0,6,0,28"/>
+
+                        <!-- Card: Statistiques principales -->
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Meilleur Score -->
+                            <Border Grid.Column="0" Style="{StaticResource StatCard}">
+                                <Grid>
+                                    <!-- Glow effect -->
+                                    <Ellipse x:Name="ScoreGlow" Width="80" Height="80" Opacity="0.3"
+                                             HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-10,-10,0">
+                                        <Ellipse.Fill>
+                                            <RadialGradientBrush>
+                                                <GradientStop Color="#18C37E" Offset="0"/>
+                                                <GradientStop Color="Transparent" Offset="1"/>
+                                            </RadialGradientBrush>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                            <Border Width="40" Height="40" CornerRadius="12">
+                                                <Border.Background>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                        <GradientStop Color="#E0F5EC" Offset="0"/>
+                                                        <GradientStop Color="#C6EBD9" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </Border.Background>
+                                                <TextBlock Text="🏆" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="Meilleur score" FontSize="14" Foreground="#667085"
+                                                       FontFamily="Segoe UI" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock x:Name="ScoreText" Text="--" FontSize="36" FontWeight="Bold"
+                                                       Foreground="#18C37E" FontFamily="Segoe UI"/>
+                                            <TextBlock Text="/40" FontSize="18" Foreground="#98A2B3"
+                                                       FontFamily="Segoe UI" VerticalAlignment="Bottom" Margin="4,0,0,7"/>
+                                        </StackPanel>
+                                        <TextBlock x:Name="ScoreDateText" Text="Aucun examen passé"
+                                                   FontSize="12" Foreground="#98A2B3" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Temps moyen -->
+                            <Border Grid.Column="2" Style="{StaticResource StatCard}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                        <Border Width="40" Height="40" CornerRadius="12">
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                    <GradientStop Color="#E8F0FF" Offset="0"/>
+                                                    <GradientStop Color="#D0E0FF" Offset="1"/>
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                            <TextBlock Text="⏱️" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <TextBlock Text="Temps moyen" FontSize="14" Foreground="#667085"
+                                                   FontFamily="Segoe UI" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="TempsText" Text="--:--" FontSize="36" FontWeight="Bold"
+                                               Foreground="{StaticResource BrushBlue}" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="sur vos derniers examens"
+                                               FontSize="12" Foreground="#98A2B3" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <!-- Card: Objectif du jour -->
+                        <Border Style="{StaticResource StatCard}" Margin="0,0,0,20">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                    <Border Width="40" Height="40" CornerRadius="12">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                <GradientStop Color="#FFF4E5" Offset="0"/>
+                                                <GradientStop Color="#FFE4C4" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                        <TextBlock Text="🎯" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center" Margin="14,0,0,0">
+                                        <TextBlock Text="Objectif du jour" FontSize="16" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource BrushNavyDeep}" FontFamily="Segoe UI"/>
+                                        <TextBlock Text="Passez au moins 1 examen aujourd'hui" FontSize="13"
+                                                   Foreground="#667085" FontFamily="Segoe UI"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- Progress bar -->
+                                <Border Background="#E8EEF5" CornerRadius="8" Height="12">
+                                    <Border x:Name="ObjectifProgress" Background="{StaticResource BrushGreen}"
+                                            CornerRadius="8" HorizontalAlignment="Left" Width="0"/>
+                                </Border>
+                                <TextBlock Text="0/1 examen complété" FontSize="12" Foreground="#98A2B3"
+                                           FontFamily="Segoe UI" Margin="0,10,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card: Actions rapides -->
+                        <Border Style="{StaticResource StatCard}" Margin="0,0,0,20">
+                            <StackPanel>
+                                <TextBlock Text="⚡ Actions rapides" FontSize="16" FontWeight="SemiBold"
+                                           Foreground="{StaticResource BrushNavyDeep}" FontFamily="Segoe UI" Margin="0,0,0,16"/>
+
+                                <WrapPanel>
+                                    <Border Style="{StaticResource ActionChip}" Margin="0,0,10,10">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="📚" FontSize="14" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Mode révision" FontSize="13" FontWeight="Medium"
+                                                       Foreground="{StaticResource BrushNavyDeep}" FontFamily="Segoe UI"
+                                                       VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Style="{StaticResource ActionChip}" Margin="0,0,10,10">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="📋" FontSize="14" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Banque de questions" FontSize="13" FontWeight="Medium"
+                                                       Foreground="{StaticResource BrushNavyDeep}" FontFamily="Segoe UI"
+                                                       VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Background="#E0F5EC" CornerRadius="12" Padding="16,12" Margin="0,0,10,10"
+                                            BorderBrush="#A8DFCA" BorderThickness="1" Cursor="Hand">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="💡" FontSize="14" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Tips ITIL" FontSize="13" FontWeight="Medium"
+                                                       Foreground="#15A86C" FontFamily="Segoe UI"
+                                                       VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card: Astuce -->
+                        <Border Style="{StaticResource StatCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="💎 Conseil du jour" FontSize="16" FontWeight="SemiBold"
+                                               Foreground="{StaticResource BrushNavyDeep}" FontFamily="Segoe UI" Margin="0,0,0,10"/>
+                                    <TextBlock Text="La régularité est la clé du succès. Un examen par jour vaut mieux qu'un marathon le week-end !"
+                                               FontSize="14" Foreground="#667085" FontFamily="Segoe UI"
+                                               TextWrapping="Wrap" LineHeight="22"/>
+                                </StackPanel>
+
+                                <Border Grid.Column="1" Width="52" Height="52" CornerRadius="14"
+                                        VerticalAlignment="Center" Margin="20,0,0,0">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#FFF8E1" Offset="0"/>
+                                            <GradientStop Color="#FFECB3" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <TextBlock Text="✨" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
         </Border>
     </Grid>
 </Page>

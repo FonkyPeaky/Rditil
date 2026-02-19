@@ -1,18 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-
-namespace Rditil.Models
+﻿namespace Rditil.Models
 {
-    public partial class ReponseChoix : ObservableObject
+    public partial class ReponseChoix
     {
-        [Key]
         public int Id { get; set; }
-        public string TextReponse { get; set; } = string.Empty;
-        public bool EstCorrect { get; set; }
+        public string? Texte { get; set; }
+        public bool EstCorrecte { get; set; }
 
-        [ObservableProperty]
-        private bool isChoisie;
+        public bool IsSelected { get; set; }
     }
 }
-
-

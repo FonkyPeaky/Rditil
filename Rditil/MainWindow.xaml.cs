@@ -1,27 +1,40 @@
-﻿using Rditil.Data;
+﻿using System.Windows;
+using System.Windows.Input;
 using Rditil.Services;
-using Rditil.ViewModels;
-using System.Windows;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace Rditil
 {
-
     public partial class MainWindow : Window
     {
-        private readonly INavigationService _navigation;
-
         public MainWindow(INavigationService navigation)
         {
             InitializeComponent();
-            _navigation = navigation;
+
+            navigation.Initialize(MainFrame);
+
+            ActivateFocusMode();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void ActivateFocusMode()
         {
-            _navigation.SetFrame(MainFrame);
-            _navigation.NavigateTo<LoginViewModel>(null);
+            WindowStyle = WindowStyle.None;
+            ResizeMode = ResizeMode.NoResize;
+            WindowState = WindowState.Maximized;
         }
 
+        private void ExitFocusMode()
+        {
+            ResizeMode = ResizeMode.CanResize;
+            WindowState = WindowState.Normal;
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                ExitFocusMode();
+                // Close();
+            }
+        }
     }
 }
