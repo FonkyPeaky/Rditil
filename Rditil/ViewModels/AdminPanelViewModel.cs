@@ -2,8 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Rditil.Data;
 using Rditil.Models;
+<<<<<<< HEAD
 using Rditil.Services;
 using System.Collections.ObjectModel;
+=======
+>>>>>>> 1908e362463a42654d4b699764460fd7abed45f8
 using System.Windows;
 
 namespace Rditil.ViewModels

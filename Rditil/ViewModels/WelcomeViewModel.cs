@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+<<<<<<< HEAD
 using Rditil.Models;
 using Rditil.Services;
+=======
+>>>>>>> 1908e362463a42654d4b699764460fd7abed45f8
 
 namespace Rditil.ViewModels
 {

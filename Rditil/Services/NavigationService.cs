@@ -1,7 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+<<<<<<< HEAD
 using Rditil.Navigation;
 using System;
 using System.Collections.Generic;
+=======
+using Rditil.Navigation; // pour ViewModelPageMapper
+>>>>>>> 1908e362463a42654d4b699764460fd7abed45f8
 using System.Reflection;
 using System.Windows.Controls;
 

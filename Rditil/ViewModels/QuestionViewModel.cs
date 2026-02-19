@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -7,6 +8,13 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Rditil;
 
+=======
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Rditil.Models;
+using System.Collections.ObjectModel;
+using System.Windows;
+using Timer = System.Timers.Timer;
+>>>>>>> 1908e362463a42654d4b699764460fd7abed45f8
 
 namespace Rditil.ViewModels
 {

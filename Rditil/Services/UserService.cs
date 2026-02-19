@@ -1,7 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Rditil.Data;
 using Rditil.Models;
+<<<<<<< HEAD
 using System.Threading.Tasks;
+=======
+//using Rditil.AppDbContext; // adapte si ton DbContext est dans un autre namespace
+>>>>>>> 1908e362463a42654d4b699764460fd7abed45f8
 
 namespace Rditil.Services
 {

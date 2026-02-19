@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 using Microsoft.Extensions.Options;
 using MimeKit;
 using System;
@@ -6,6 +7,12 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Rditil.Models;
+=======
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.Extensions.Options;
+using MimeKit;
+>>>>>>> 1908e362463a42654d4b699764460fd7abed45f8
 
 namespace Rditil.Services
 {

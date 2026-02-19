@@ -1,6 +1,5 @@
 ﻿using Rditil.Data;
 using Rditil.Models;
-using System.Linq;
 
 namespace Rditil.Services
 {
@@ -12,7 +11,7 @@ namespace Rditil.Services
         {
             _context = context;
         }
-    
+
         public Utilisateur GetUserByEmailAndPassword(string email, string password)
         {
             return _context.Utilisateurs.FirstOrDefault(u => u.Email == email && u.PasswordHash == password);

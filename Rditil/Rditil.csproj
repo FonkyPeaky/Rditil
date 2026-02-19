@@ -17,7 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Converters\" />
     <Folder Include="Navigation\" />
+    <Folder Include="Asset\" />
     <Folder Include="Resources\" />
     <Folder Include="Resources\" />
 	<Resource Include="Resources\QR_code_code_pin.png" />
@@ -45,4 +47,11 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Asset\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

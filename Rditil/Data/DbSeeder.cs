@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Rditil.Models;
+﻿using Rditil.Models;
 
 namespace Rditil.Data
 {
@@ -17,8 +14,9 @@ namespace Rditil.Data
                 context.Utilisateurs.Add(new Utilisateur
                 {
                     Nom = "Testeurosorus",
+                    Prenom = "chacal",
                     Email = "test",
-                    PasswordHash = PasswordHelper.HashPassword("Test"),
+                    PasswordHash = PasswordHelper.HashPassword("test"),
                     Score = 0,
                     DernierExamen = DateTime.UtcNow
                 });

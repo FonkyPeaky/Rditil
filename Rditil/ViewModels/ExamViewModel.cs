@@ -2,13 +2,15 @@ using Microsoft.EntityFrameworkCore;
 using Rditil.Data;
 using Rditil.Models;
 using Rditil.Services;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+<<<<<<< HEAD
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Timer = System.Timers.Timer;
+=======
+using System.Windows.Threading;
+>>>>>>> 1908e362463a42654d4b699764460fd7abed45f8
 
 namespace Rditil.ViewModels
 {
@@ -37,7 +39,34 @@ namespace Rditil.ViewModels
 
         private readonly Dictionary<int, int?> _chosenByQuestionId = new();
 
+<<<<<<< HEAD
         public ObservableCollection<Question> Questions
+=======
+        private List<Question> _questions = new();
+        private int _index = 0;
+        private int _score = 0;
+
+        public event EventHandler<ExamFinishedEventArgs> ExamFinished;
+
+
+        // 🌟 AJOUT : Progression → utilisée par la ProgressBar
+        public double Progression
+        {
+            get
+            {
+                if (_questions == null || _questions.Count == 0)
+                    return 0;
+
+                return (_index / (double)_questions.Count) * 100.0;
+            }
+        }
+
+
+        public IAsyncRelayCommand QuestionSuivanteCommand { get; }
+        public IAsyncRelayCommand DemarrerCommand { get; }
+
+        public ExamViewModel(AppDbContext ctx, IEmailService emailService, string userEmail, string managerEmail)
+>>>>>>> 1908e362463a42654d4b699764460fd7abed45f8
         {
             get => _questions;
             private set { _questions = value; OnPropertyChanged(); }
@@ -49,6 +78,7 @@ namespace Rditil.ViewModels
             get => _currentQuestion;
             private set
             {
+<<<<<<< HEAD
                 _currentQuestion = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(Enonce));
@@ -104,6 +134,12 @@ namespace Rditil.ViewModels
                 });
 
                 if (remaining == TimeSpan.Zero)
+=======
+                _remaining -= TimeSpan.FromSeconds(1);
+                TempsRestantText = _remaining.ToString(@"hh\:mm\:ss");
+
+                if (_remaining <= TimeSpan.Zero)
+>>>>>>> 1908e362463a42654d4b699764460fd7abed45f8
                 {
                     _timer.Stop();
                     App.Current.Dispatcher.Invoke(FinishExam);
@@ -111,6 +147,7 @@ namespace Rditil.ViewModels
             };
         }
 
+<<<<<<< HEAD
         public void OnNavigatedTo(Dictionary<string, object?>? parameters)
 {
     System.Diagnostics.Debug.WriteLine("[ExamViewModel] OnNavigatedTo -> EnsureLoadedAsync()");
@@ -127,11 +164,104 @@ namespace Rditil.ViewModels
             _startedAtUtc = DateTime.UtcNow;
             _examEndUtc = _startedAtUtc.AddHours(1);
             TempsRestantText = TimeSpan.FromHours(1).ToString(@"hh\:mm\:ss");
+=======
+
+        // Méthode déclenchée depuis ExamenView.xaml.cs
+        public async void Demarrer() => await DemarrerAsync();
+
+
+        private async Task DemarrerAsync()
+        {
+            _startUtc = DateTime.UtcNow;
+            _remaining = TimeSpan.FromHours(1);
+            TempsRestantText = _remaining.ToString(@"hh\:mm\:ss");
+
+            _score = 0;
+            _index = 0;
+
+            // 🔥 IMPORTANT : notifier la ProgressBar
+            OnPropertyChanged(nameof(Progression));
+
+            // Charger 40 questions tirées au hasard
+            var all = await _ctx.Questions
+                .Include(q => q.Reponses)
+                .ToListAsync();
+
+            _questions = all.OrderBy(_ => Guid.NewGuid()).Take(40).ToList();
+
+            ChargerQuestion(_index);
+>>>>>>> 1908e362463a42654d4b699764460fd7abed45f8
             _timer.Start();
 
+<<<<<<< HEAD
             try
             {
                 await using var db = await _dbFactory.CreateDbContextAsync();
+=======
+
+        private void ChargerQuestion(int i)
+        {
+            if (i < 0 || i >= _questions.Count)
+                return;
+
+            QuestionEnCours = _questions[i];
+
+            var items = QuestionEnCours.Reponses
+                .Select(r => new ReponseChoix
+                {
+                    Id = r.Id_Reponse,
+                    TextReponse = r.TextReponse ?? string.Empty,
+                    EstCorrect = r.EstCorrect
+                })
+                .OrderBy(_ => Guid.NewGuid())
+                .ToList();
+
+            ReponsesChoix = new ObservableCollection<ReponseChoix>(items);
+        }
+
+
+        private async Task ValiderEtSuivantAsync()
+        {
+            // Vérifier la bonne réponse
+            var selected = ReponsesChoix.Where(x => x.IsChoisie).Select(x => x.Id).ToHashSet();
+            var correct = ReponsesChoix.Where(x => x.EstCorrect).Select(x => x.Id).ToHashSet();
+
+            if (selected.SetEquals(correct))
+                _score++;
+
+            // Passer à la question suivante
+            _index++;
+
+            // 🔥 IMPORTANT : notifier la progression
+            OnPropertyChanged(nameof(Progression));
+
+            if (_index < _questions.Count)
+            {
+                ChargerQuestion(_index);
+            }
+            else
+            {
+                _timer.Stop();
+                Finish(timeExpired: false);
+            }
+
+            await Task.CompletedTask;
+        }
+
+
+        private void Finish(bool timeExpired)
+        {
+            var used = DateTime.UtcNow - _startUtc;
+
+            try
+            {
+                _ = _emailService.SendExamResultAsync(_managerEmail, _userEmail, _score, _questions.Count);
+            }
+            catch
+            {
+                // On ne bloque pas si l'email échoue
+            }
+>>>>>>> 1908e362463a42654d4b699764460fd7abed45f8
 
                 var list = await db.Questions
                     .Include(q => q.Reponses)

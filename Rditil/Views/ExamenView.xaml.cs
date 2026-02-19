@@ -1,6 +1,14 @@
+<<<<<<< HEAD
 ﻿using Rditil.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
+=======
+﻿using Microsoft.Extensions.DependencyInjection;
+using Rditil.Data;
+using Rditil.Services;
+using Rditil.ViewModels;
+using System.Windows;
+>>>>>>> 1908e362463a42654d4b699764460fd7abed45f8
 
 namespace Rditil.Views
 {

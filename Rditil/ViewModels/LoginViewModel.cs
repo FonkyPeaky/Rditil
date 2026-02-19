@@ -1,9 +1,16 @@
+<<<<<<< HEAD
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rditil.Services;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+=======
+﻿using CommunityToolkit.Mvvm.Input;
+using Rditil.Services;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+>>>>>>> 1908e362463a42654d4b699764460fd7abed45f8
 
 namespace Rditil.ViewModels
 {
@@ -26,7 +33,17 @@ namespace Rditil.ViewModels
         public LoginViewModel(IUserService userService, IAppState appState)
         {
             _userService = userService;
+<<<<<<< HEAD
             _appState = appState;
+=======
+            _navigationService = navigationService;
+
+            // ✅ force l’AsyncRelayCommand du Toolkit, overload sans paramètre
+            LoginCommand = new CommunityToolkit.Mvvm.Input.AsyncRelayCommand(LoginAsync);
+
+            // ✅ commande sync
+            CreateAccountCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(NavigateToAdmin);
+>>>>>>> 1908e362463a42654d4b699764460fd7abed45f8
         }
 
         [RelayCommand]

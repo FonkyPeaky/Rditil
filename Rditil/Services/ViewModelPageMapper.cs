@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 ﻿using System;
 using System.Collections.Generic;
 using Rditil.ViewModels;
+=======
+﻿using Rditil.ViewModels;
+>>>>>>> 1908e362463a42654d4b699764460fd7abed45f8
 using Rditil.Views;
 
 namespace Rditil.Navigation
